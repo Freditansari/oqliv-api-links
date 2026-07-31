@@ -2,98 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
+  />
+
+  <meta
+    name="description"
+    content="Download OQLIV stock price, earnings, cumulative return, and drawdown data."
   />
 
   <title>OQLIV Important Data</title>
 
   <style>
     :root {
-      --bg: #070707;
-      --card: #111111;
-      --card-hover: #171717;
+      --background: #050505;
+      --surface: #111111;
+      --surface-hover: #181818;
+      --surface-soft: #0a0a0a;
       --border: #292929;
-      --text: #f7f7f7;
+      --border-active: #ff7a00;
+      --text: #f5f5f5;
       --muted: #999999;
       --orange: #ff7a00;
       --orange-hover: #ff922b;
-      --green: #27c281;
-      --red: #ff5c5c;
+      --green: #25c783;
+      --red: #ff6060;
+      --shadow: rgba(0, 0, 0, 0.38);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      color-scheme: dark;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
+
       background:
         radial-gradient(
-          circle at top,
-          rgba(255, 122, 0, 0.12),
-          transparent 35%
+          circle at top center,
+          rgba(255, 122, 0, 0.14),
+          transparent 34%
         ),
-        var(--bg);
+        var(--background);
 
       color: var(--text);
+
       font-family:
         Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
         sans-serif;
     }
 
-    .page {
-      width: min(100%, 620px);
-      margin: 0 auto;
-      padding: 44px 18px 60px;
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
-    .header {
-      text-align: center;
+    .container {
+      width: min(100%, 640px);
+      margin: 0 auto;
+      padding: 42px 18px 60px;
+    }
+
+    .profile {
       margin-bottom: 28px;
+      text-align: center;
     }
 
     .logo {
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 14px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
 
       display: flex;
       align-items: center;
       justify-content: center;
 
-      border: 1px solid rgba(255, 122, 0, 0.45);
-      border-radius: 22px;
+      border: 1px solid rgba(255, 122, 0, 0.5);
+      border-radius: 24px;
 
-      background: #0c0c0c;
+      background: #090909;
       color: var(--orange);
 
-      font-size: 30px;
+      font-size: 29px;
       font-weight: 900;
       letter-spacing: -2px;
 
       box-shadow:
-        0 10px 40px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(255, 122, 0, 0.12);
+        0 18px 45px var(--shadow),
+        0 0 32px rgba(255, 122, 0, 0.12);
     }
 
     h1 {
       margin: 0;
-      font-size: 27px;
+      font-size: 28px;
+      line-height: 1.15;
       letter-spacing: -0.8px;
     }
 
-    .subtitle {
-      max-width: 470px;
+    .profile-description {
+      max-width: 500px;
       margin: 10px auto 0;
+
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     .card {
@@ -102,102 +128,117 @@
 
       background: rgba(17, 17, 17, 0.96);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 19px;
 
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 14px 42px rgba(0, 0, 0, 0.22);
     }
 
-    .label {
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
       display: block;
       margin-bottom: 8px;
 
-      color: #cfcfcf;
+      color: #d0d0d0;
+
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
     }
 
     input,
-    select,
-    button {
-      width: 100%;
-      border-radius: 13px;
-      font: inherit;
-    }
-
-    input,
     select {
+      width: 100%;
       height: 50px;
       padding: 0 14px;
 
       border: 1px solid #333333;
+      border-radius: 13px;
       outline: none;
 
       background: #080808;
       color: var(--text);
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
     }
 
     input {
       text-transform: uppercase;
     }
 
+    input::placeholder {
+      color: #666666;
+    }
+
     input:focus,
     select:focus {
-      border-color: var(--orange);
+      border-color: var(--border-active);
       box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.12);
     }
 
-    .grid {
+    .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 14px;
     }
 
     button {
+      width: 100%;
       min-height: 52px;
       padding: 12px 16px;
 
       border: 0;
+      border-radius: 13px;
       cursor: pointer;
 
-      font-weight: 800;
+      font-weight: 850;
+
       transition:
         transform 0.15s ease,
+        opacity 0.15s ease,
         background 0.15s ease,
-        opacity 0.15s ease;
+        border-color 0.15s ease;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       transform: translateY(-1px);
     }
 
     button:disabled {
       cursor: not-allowed;
       opacity: 0.55;
-      transform: none;
     }
 
-    .primary {
-      margin-top: 16px;
+    .primary-button {
+      margin-top: 2px;
       background: var(--orange);
-      color: #090909;
+      color: #080808;
     }
 
-    .primary:hover {
+    .primary-button:hover:not(:disabled) {
       background: var(--orange-hover);
     }
 
-    .secondary {
+    .secondary-button {
+      margin-top: 14px;
+
       background: #191919;
       color: var(--text);
       border: 1px solid #333333;
     }
 
-    .secondary:hover {
-      background: var(--card-hover);
-      border-color: #444444;
+    .secondary-button:hover:not(:disabled) {
+      background: var(--surface-hover);
+      border-color: #484848;
     }
 
     .status {
@@ -206,47 +247,62 @@
       padding: 12px 14px;
 
       border-radius: 12px;
+
       font-size: 13px;
       line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
     .status.loading {
       display: block;
-      color: #ffd2a6;
+
+      color: #ffd1a3;
       background: rgba(255, 122, 0, 0.1);
       border: 1px solid rgba(255, 122, 0, 0.3);
     }
 
     .status.error {
       display: block;
-      color: #ffb0b0;
-      background: rgba(255, 92, 92, 0.1);
-      border: 1px solid rgba(255, 92, 92, 0.3);
+
+      color: #ffb3b3;
+      background: rgba(255, 96, 96, 0.1);
+      border: 1px solid rgba(255, 96, 96, 0.3);
     }
 
-    .results {
+    .status.success {
+      display: block;
+
+      color: #9ee8c8;
+      background: rgba(37, 199, 131, 0.1);
+      border: 1px solid rgba(37, 199, 131, 0.3);
+    }
+
+    .results-card {
       display: none;
     }
 
-    .results.visible {
+    .results-card.visible {
       display: block;
     }
 
-    .result-header {
+    .results-header {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 14px;
+      margin-bottom: 17px;
     }
 
-    .ticker-name {
+    .result-ticker {
       margin: 0;
-      font-size: 24px;
+
+      font-size: 25px;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
 
-    .as-of {
-      margin-top: 4px;
+    .result-date {
+      margin-top: 5px;
       color: var(--muted);
       font-size: 12px;
     }
@@ -255,18 +311,18 @@
       flex-shrink: 0;
       padding: 7px 10px;
 
-      border: 1px solid rgba(255, 122, 0, 0.35);
+      border: 1px solid rgba(255, 122, 0, 0.38);
       border-radius: 999px;
 
       background: rgba(255, 122, 0, 0.09);
       color: var(--orange);
 
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 850;
       text-transform: uppercase;
     }
 
-    .stats {
+    .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
@@ -276,22 +332,28 @@
       min-height: 94px;
       padding: 14px;
 
-      background: #090909;
-      border: 1px solid #262626;
+      background: var(--surface-soft);
+      border: 1px solid #272727;
       border-radius: 14px;
     }
 
-    .stat-name {
+    .stat-label {
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.3;
     }
 
     .stat-value {
-      margin-top: 8px;
+      margin-top: 9px;
+
+      color: var(--text);
+
       font-size: 20px;
       font-weight: 850;
-      letter-spacing: -0.4px;
-      word-break: break-word;
+      line-height: 1.15;
+      letter-spacing: -0.35px;
+
+      overflow-wrap: anywhere;
     }
 
     .positive {
@@ -306,8 +368,13 @@
       color: var(--text);
     }
 
-    .download-button {
-      margin-top: 14px;
+    .data-note {
+      margin: 14px 2px 0;
+
+      color: #777777;
+
+      font-size: 11px;
+      line-height: 1.55;
     }
 
     .links {
@@ -316,18 +383,19 @@
       margin-top: 14px;
     }
 
-    .link-card {
+    .link-button {
       display: block;
       padding: 16px 18px;
 
       color: var(--text);
-      text-decoration: none;
       text-align: center;
-      font-weight: 750;
+      text-decoration: none;
 
-      background: var(--card);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
+
+      font-weight: 780;
 
       transition:
         transform 0.15s ease,
@@ -335,204 +403,327 @@
         background 0.15s ease;
     }
 
-    .link-card:hover {
+    .link-button:hover {
       transform: translateY(-1px);
-      background: var(--card-hover);
+      background: var(--surface-hover);
       border-color: rgba(255, 122, 0, 0.65);
     }
 
     footer {
       margin-top: 28px;
-      color: #707070;
+
+      color: #6e6e6e;
+
       text-align: center;
       font-size: 12px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 500px) {
-      .page {
+    @media (max-width: 520px) {
+      .container {
         padding-top: 30px;
       }
 
-      .grid,
-      .stats {
+      .form-grid,
+      .stats-grid {
         grid-template-columns: 1fr;
       }
 
       .stat {
-        min-height: 80px;
+        min-height: 79px;
+      }
+
+      .results-header {
+        align-items: center;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="page">
-    <header class="header">
+  <main class="container">
+    <header class="profile">
       <div class="logo">OQ</div>
 
-      <h1>OQLIV APIs</h1>
+      <h1>OQLIV Important Data</h1>
 
-      <p class="subtitle">
-   
+      <p class="profile-description">
+        Download stock price history, earnings dates,
+        cumulative returns and drawdowns in JSON format.
       </p>
     </header>
 
     <section class="card">
       <form id="dataForm">
-        <label class="label" for="ticker">
-          Stock ticker
-        </label>
+        <div class="field">
+          <label
+            class="field-label"
+            for="ticker"
+          >
+            Stock ticker
+          </label>
 
-        <input
-          id="ticker"
-          name="ticker"
-          type="text"
-          value="AAPL"
-          placeholder="AAPL"
-          autocomplete="off"
-          required
-        />
+          <input
+            id="ticker"
+            name="ticker"
+            type="text"
+            value="AAPL"
+            placeholder="AAPL"
+            autocomplete="off"
+            spellcheck="false"
+            required
+          />
+        </div>
 
-        <div class="grid">
-          <div>
-            <label class="label" for="period">
+        <div class="form-grid">
+          <div class="field">
+            <label
+              class="field-label"
+              for="period"
+            >
               Period
             </label>
 
-            <select id="period" name="period">
-              <option value="6mo">6 months</option>
-              <option value="1y">1 year</option>
-              <option value="2y" selected>2 years</option>
-              <option value="5y">5 years</option>
-              <option value="10y">10 years</option>
-              <option value="max">Maximum</option>
+            <select
+              id="period"
+              name="period"
+            >
+              <option value="1mo">
+                1 month
+              </option>
+
+              <option value="3mo">
+                3 months
+              </option>
+
+              <option value="6mo">
+                6 months
+              </option>
+
+              <option value="1y">
+                1 year
+              </option>
+
+              <option value="2y" selected>
+                2 years
+              </option>
+
+              <option value="5y">
+                5 years
+              </option>
+
+              <option value="10y">
+                10 years
+              </option>
+
+              <option value="ytd">
+                Year to date
+              </option>
+
+              <option value="max">
+                Maximum
+              </option>
             </select>
           </div>
 
-          <div>
-            <label class="label" for="interval">
+          <div class="field">
+            <label
+              class="field-label"
+              for="interval"
+            >
               Interval
             </label>
 
-            <select id="interval" name="interval">
-              <option value="1d" selected>Daily</option>
-              <option value="5d">5 days</option>
-              <option value="1wk">Weekly</option>
-              <option value="1mo">Monthly</option>
+            <select
+              id="interval"
+              name="interval"
+            >
+              <option value="1d" selected>
+                Daily
+              </option>
+
+              <option value="5d">
+                5 days
+              </option>
+
+              <option value="1wk">
+                Weekly
+              </option>
+
+              <option value="1mo">
+                Monthly
+              </option>
+
+              <option value="3mo">
+                3 months
+              </option>
             </select>
           </div>
         </div>
 
         <button
           id="loadButton"
-          class="primary"
+          class="primary-button"
           type="submit"
         >
-         Download Data
+          View important data
         </button>
 
-        <div id="status" class="status"></div>
+        <div
+          id="status"
+          class="status"
+          role="status"
+          aria-live="polite"
+        ></div>
       </form>
     </section>
 
-    <section id="results" class="card results">
-      <div class="result-header">
+    <section
+      id="resultsCard"
+      class="card results-card"
+    >
+      <div class="results-header">
         <div>
-          <h2 id="resultTicker" class="ticker-name">
+          <h2
+            id="resultTicker"
+            class="result-ticker"
+          >
             AAPL
           </h2>
 
-          <div id="resultDate" class="as-of"></div>
+          <div
+            id="resultDate"
+            class="result-date"
+          ></div>
         </div>
 
-        <div class="badge">OQLIV Data</div>
+        <div class="badge">
+          OQLIV Data
+        </div>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-name">Latest close</div>
-          <div id="latestClose" class="stat-value">
-            —
+      <div class="stats-grid">
+        <article class="stat">
+          <div class="stat-label">
+            Latest adjusted close
           </div>
-        </div>
 
-        <div class="stat">
-          <div class="stat-name">Cumulative gain</div>
-          <div id="cumulativeGain" class="stat-value">
+          <div
+            id="latestClose"
+            class="stat-value neutral"
+          >
             —
           </div>
-        </div>
+        </article>
 
-        <div class="stat">
-          <div class="stat-name">Current drawdown</div>
-          <div id="currentDrawdown" class="stat-value">
-            —
+        <article class="stat">
+          <div class="stat-label">
+            Cumulative gain
           </div>
-        </div>
 
-        <div class="stat">
-          <div class="stat-name">Maximum drawdown</div>
-          <div id="maximumDrawdown" class="stat-value">
+          <div
+            id="cumulativeGain"
+            class="stat-value neutral"
+          >
             —
           </div>
-        </div>
+        </article>
 
-        <div class="stat">
-          <div class="stat-name">Trading records</div>
-          <div id="tradingDays" class="stat-value">
-            —
+        <article class="stat">
+          <div class="stat-label">
+            Current drawdown
           </div>
-        </div>
 
-        <div class="stat">
-          <div class="stat-name">Next earnings</div>
-          <div id="nextEarnings" class="stat-value">
+          <div
+            id="currentDrawdown"
+            class="stat-value neutral"
+          >
             —
           </div>
-        </div>
+        </article>
+
+        <article class="stat">
+          <div class="stat-label">
+            Maximum drawdown
+          </div>
+
+          <div
+            id="maximumDrawdown"
+            class="stat-value neutral"
+          >
+            —
+          </div>
+        </article>
+
+        <article class="stat">
+          <div class="stat-label">
+            Trading records
+          </div>
+
+          <div
+            id="tradingDays"
+            class="stat-value neutral"
+          >
+            —
+          </div>
+        </article>
+
+        <article class="stat">
+          <div class="stat-label">
+            Next earnings
+          </div>
+
+          <div
+            id="nextEarnings"
+            class="stat-value neutral"
+          >
+            —
+          </div>
+        </article>
       </div>
 
       <button
         id="downloadButton"
-        class="secondary download-button"
+        class="secondary-button"
         type="button"
       >
         Download JSON
       </button>
+
+      <p class="data-note">
+        The JSON file includes OHLCV prices, daily returns,
+        cumulative gains, running peaks, drawdowns and earnings data.
+      </p>
     </section>
 
-    <section class="links">
+    <nav class="links">
       <a
-        class="link-card"
+        class="link-button"
         href="https://www.oqliv.com"
         target="_blank"
         rel="noopener noreferrer"
       >
-        oqliv.com
+        Open OQLIV
       </a>
 
       <a
-        class="link-card"
-        href="https://www.patreon.com/oqliv"
+        class="link-button"
+        href="https://oqliv.beehiiv.com"
         target="_blank"
         rel="noopener noreferrer"
       >
         OQLIV Newsletter
       </a>
-    </section>
+    </nav>
 
     <footer>
-      Market data is provided for research purposes.
+      Market information is provided for research purposes only.
     </footer>
   </main>
 
   <script>
-    /*
-      Karena HTML ini dipasang di www.oqliv.com,
-      endpoint menggunakan relative URL.
-    */
     const API_ENDPOINT =
-      "/performance/api/json/price-earnings-drawdowns";
+      "https://www.oqliv.com/performance/api/json/price-earnings-drawdowns";
 
     const dataForm =
       document.getElementById("dataForm");
@@ -555,24 +746,30 @@
     const statusBox =
       document.getElementById("status");
 
-    const resultsBox =
-      document.getElementById("results");
+    const resultsCard =
+      document.getElementById("resultsCard");
 
-    let currentRequest = null;
+    let activeController = null;
+
+
+    function normalizeTicker(value) {
+      return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+    }
+
 
     function buildApiUrl(download = false) {
-      const ticker = tickerInput.value
-        .trim()
-        .toUpperCase();
+      const ticker =
+        normalizeTicker(tickerInput.value);
 
-      const period = periodInput.value;
-      const interval = intervalInput.value;
-
-      const query = new URLSearchParams({
-        ticker,
-        period,
-        interval
-      });
+      const query =
+        new URLSearchParams({
+          ticker: ticker,
+          period: periodInput.value,
+          interval: intervalInput.value
+        });
 
       if (download) {
         query.set("download", "1");
@@ -580,6 +777,7 @@
 
       return `${API_ENDPOINT}?${query.toString()}`;
     }
+
 
     function setStatus(message, type = "") {
       statusBox.textContent = message;
@@ -590,10 +788,12 @@
       }
     }
 
+
     function clearStatus() {
       statusBox.textContent = "";
       statusBox.className = "status";
     }
+
 
     function formatNumber(value, decimals = 2) {
       const number = Number(value);
@@ -602,11 +802,15 @@
         return "—";
       }
 
-      return number.toLocaleString("en-US", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
+      return number.toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        }
+      );
     }
+
 
     function formatPercent(value) {
       const number = Number(value);
@@ -615,30 +819,39 @@
         return "—";
       }
 
-      const sign = number > 0 ? "+" : "";
+      const sign =
+        number > 0
+          ? "+"
+          : "";
 
       return `${sign}${formatNumber(number, 2)}%`;
     }
+
 
     function formatDate(value) {
       if (!value) {
         return "Not available";
       }
 
-      const date = new Date(value);
+      const date =
+        new Date(value);
 
       if (Number.isNaN(date.getTime())) {
         return String(value);
       }
 
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      });
+      return date.toLocaleDateString(
+        "en-US",
+        {
+          year: "numeric",
+          month: "short",
+          day: "numeric"
+        }
+      );
     }
 
-    function setValueClass(element, value) {
+
+    function setNumberClass(element, value) {
       const number = Number(value);
 
       element.classList.remove(
@@ -649,92 +862,164 @@
 
       if (!Number.isFinite(number) || number === 0) {
         element.classList.add("neutral");
-      } else if (number > 0) {
-        element.classList.add("positive");
-      } else {
-        element.classList.add("negative");
+        return;
       }
+
+      if (number > 0) {
+        element.classList.add("positive");
+        return;
+      }
+
+      element.classList.add("negative");
     }
 
+
     function showResults(payload) {
-      const metadata = payload.metadata || {};
+      const metadata =
+        payload.metadata || {};
 
-      document.getElementById("resultTicker").textContent =
-        metadata.ticker || tickerInput.value.toUpperCase();
+      const ticker =
+        metadata.ticker ||
+        normalizeTicker(tickerInput.value);
 
-      document.getElementById("resultDate").textContent =
+      document.getElementById(
+        "resultTicker"
+      ).textContent = ticker;
+
+      document.getElementById(
+        "resultDate"
+      ).textContent =
         metadata.price_end_date
           ? `Data through ${formatDate(metadata.price_end_date)}`
           : "";
 
-      document.getElementById("latestClose").textContent =
+      document.getElementById(
+        "latestClose"
+      ).textContent =
         formatNumber(
           metadata.latest_adjusted_close ??
-          metadata.latest_close
+          metadata.latest_close,
+          2
         );
 
       const cumulativeGain =
-        document.getElementById("cumulativeGain");
+        document.getElementById(
+          "cumulativeGain"
+        );
 
       cumulativeGain.textContent =
         formatPercent(
           metadata.latest_cumulative_gain_pct
         );
 
-      setValueClass(
+      setNumberClass(
         cumulativeGain,
         metadata.latest_cumulative_gain_pct
       );
 
       const currentDrawdown =
-        document.getElementById("currentDrawdown");
+        document.getElementById(
+          "currentDrawdown"
+        );
 
       currentDrawdown.textContent =
         formatPercent(
           metadata.latest_drawdown_pct
         );
 
-      setValueClass(
+      setNumberClass(
         currentDrawdown,
         metadata.latest_drawdown_pct
       );
 
       const maximumDrawdown =
-        document.getElementById("maximumDrawdown");
+        document.getElementById(
+          "maximumDrawdown"
+        );
 
       maximumDrawdown.textContent =
         formatPercent(
           metadata.maximum_drawdown_pct
         );
 
-      setValueClass(
+      setNumberClass(
         maximumDrawdown,
         metadata.maximum_drawdown_pct
       );
 
-      document.getElementById("tradingDays").textContent =
+      document.getElementById(
+        "tradingDays"
+      ).textContent =
         metadata.trading_days ??
         payload.prices?.length ??
         "—";
 
-      document.getElementById("nextEarnings").textContent =
+      document.getElementById(
+        "nextEarnings"
+      ).textContent =
         formatDate(
           metadata.next_earnings_date_utc
         );
 
-      resultsBox.classList.add("visible");
+      resultsCard.classList.add(
+        "visible"
+      );
     }
+
+
+    async function parseJsonResponse(response) {
+      const rawBody =
+        await response.text();
+
+      let payload;
+
+      try {
+        payload =
+          JSON.parse(rawBody);
+      } catch (error) {
+        console.error(
+          "Requested URL:",
+          response.url
+        );
+
+        console.error(
+          "Response body:",
+          rawBody
+        );
+
+        throw new Error(
+          `The server returned a non-JSON response. HTTP ${response.status}.`
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          payload.detail ||
+          payload.error ||
+          `Request failed with HTTP ${response.status}.`
+        );
+      }
+
+      return payload;
+    }
+
 
     async function loadData(event) {
       event.preventDefault();
 
-      const ticker = tickerInput.value
-        .trim()
-        .toUpperCase();
+      const ticker =
+        normalizeTicker(
+          tickerInput.value
+        );
 
-      tickerInput.value = ticker;
+      tickerInput.value =
+        ticker;
 
       if (!ticker) {
+        resultsCard.classList.remove(
+          "visible"
+        );
+
         setStatus(
           "Please enter a ticker.",
           "error"
@@ -743,14 +1028,19 @@
         return;
       }
 
-      if (currentRequest) {
-        currentRequest.abort();
+      if (activeController) {
+        activeController.abort();
       }
 
-      currentRequest = new AbortController();
+      activeController =
+        new AbortController();
 
       loadButton.disabled = true;
       downloadButton.disabled = true;
+
+      resultsCard.classList.remove(
+        "visible"
+      );
 
       setStatus(
         `Loading ${ticker} data...`,
@@ -758,53 +1048,66 @@
       );
 
       try {
-        const response = await fetch(
-          buildApiUrl(false),
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json"
-            },
-            signal: currentRequest.signal
-          }
-        );
+        const apiUrl =
+          buildApiUrl(false);
 
-        const payload = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            payload.detail ||
-            payload.error ||
-            `Request failed with status ${response.status}`
+        const response =
+          await fetch(
+            apiUrl,
+            {
+              method: "GET",
+              mode: "cors",
+              cache: "no-store",
+              headers: {
+                Accept: "application/json"
+              },
+              signal: activeController.signal
+            }
           );
-        }
+
+        const payload =
+          await parseJsonResponse(
+            response
+          );
 
         showResults(payload);
-        clearStatus();
+
+        setStatus(
+          `${ticker} data loaded successfully.`,
+          "success"
+        );
 
       } catch (error) {
         if (error.name === "AbortError") {
           return;
         }
 
-        resultsBox.classList.remove("visible");
+        resultsCard.classList.remove(
+          "visible"
+        );
 
         setStatus(
-          error.message || "Unable to load market data.",
+          error.message ||
+          "Unable to load market data.",
           "error"
         );
 
       } finally {
         loadButton.disabled = false;
         downloadButton.disabled = false;
-        currentRequest = null;
+        activeController = null;
       }
     }
 
+
     function downloadJson() {
-      const ticker = tickerInput.value
-        .trim()
-        .toUpperCase();
+      const ticker =
+        normalizeTicker(
+          tickerInput.value
+        );
+
+      tickerInput.value =
+        ticker;
 
       if (!ticker) {
         setStatus(
@@ -815,29 +1118,34 @@
         return;
       }
 
-      /*
-        Browser langsung membuka endpoint download.
-        Flask akan mengirim file JSON sebagai attachment.
-      */
-      window.location.href = buildApiUrl(true);
+      const downloadUrl =
+        buildApiUrl(true);
+
+      window.location.assign(
+        downloadUrl
+      );
     }
+
 
     dataForm.addEventListener(
       "submit",
       loadData
     );
 
+
     downloadButton.addEventListener(
       "click",
       downloadJson
     );
 
+
     tickerInput.addEventListener(
       "input",
       function () {
-        this.value = this.value
-          .toUpperCase()
-          .replace(/\s+/g, "");
+        this.value =
+          normalizeTicker(
+            this.value
+          );
       }
     );
   </script>
