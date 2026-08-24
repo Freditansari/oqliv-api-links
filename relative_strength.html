@@ -698,6 +698,51 @@
 
     let latestPayload = null;
 
+    const TICKERS_STORAGE_KEY =
+      "oqliv.relativeRotation.tickers";
+
+    function loadSavedTickers() {
+      try {
+        const saved =
+          localStorage.getItem(
+            TICKERS_STORAGE_KEY
+          );
+
+        if (saved) {
+          tickersInput.value =
+            saved;
+        }
+      } catch (error) {
+        console.warn(
+          "Unable to read saved tickers:",
+          error
+        );
+      }
+    }
+
+    function saveTickers(value) {
+      try {
+        const normalized =
+          normalizeTickerList(value);
+
+        if (normalized) {
+          localStorage.setItem(
+            TICKERS_STORAGE_KEY,
+            normalized
+          );
+        } else {
+          localStorage.removeItem(
+            TICKERS_STORAGE_KEY
+          );
+        }
+      } catch (error) {
+        console.warn(
+          "Unable to save tickers:",
+          error
+        );
+      }
+    }
+
     function normalizeTicker(value) {
       return String(value || "")
         .trim()
@@ -751,6 +796,7 @@
 
       benchmarkInput.value = benchmark;
       tickersInput.value = tickers;
+      saveTickers(tickers);
 
       const query =
         new URLSearchParams({
@@ -1777,6 +1823,10 @@
       function () {
         this.value =
           this.value.toUpperCase();
+
+        saveTickers(
+          this.value
+        );
       }
     );
 
@@ -1791,6 +1841,7 @@
       }
     );
 
+    loadSavedTickers();
     loadRotation();
   </script>
 </body>
