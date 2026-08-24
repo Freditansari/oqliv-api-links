@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="OQLIV Relative Rotation dashboard" />
+  <title>OQLIV Relative Rotation</title>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #111111;
+      --panel-2: #0a0a0a;
+      --border: #292929;
+      --text: #f5f5f5;
+      --muted: #969696;
+      --orange: #ff7a00;
+      --orange-2: #ff922b;
+      --green: #25c783;
+      --yellow: #f6c85f;
+      --red: #ff6060;
+      --blue: #5aa7ff;
+      --grid: #353535;
+      --axis: #858585;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top center, rgba(255, 122, 0, 0.12), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1500px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 122, 0, 0.55);
+      border-radius: 15px;
+      background: #090909;
+      color: var(--orange);
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      box-shadow: 0 12px 34px var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 32px);
+      letter-spacing: -0.7px;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .method-pill {
+      flex-shrink: 0;
+      padding: 8px 11px;
+      border: 1px solid rgba(255, 122, 0, 0.38);
+      border-radius: 999px;
+      color: var(--orange);
+      background: rgba(255, 122, 0, 0.08);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+    }
+
+    .panel {
+      background: rgba(17, 17, 17, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+    }
+
+    .controls {
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns:
+        minmax(120px, 0.8fr)
+        minmax(300px, 2.3fr)
+        minmax(100px, 0.65fr)
+        minmax(100px, 0.65fr)
+        minmax(100px, 0.65fr)
+        minmax(90px, 0.55fr)
+        135px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #c8c8c8;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.65px;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #333;
+      border-radius: 11px;
+      outline: 0;
+      background: #080808;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+    }
+
+    #benchmark,
+    #tickers {
+      text-transform: uppercase;
+    }
+
+    .load-button {
+      height: 44px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--orange);
+      color: #090909;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .load-button:hover:not(:disabled) {
+      background: var(--orange-2);
+    }
+
+    .load-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    .status {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .status.visible {
+      display: block;
+    }
+
+    .status.loading {
+      color: #ffd0a1;
+      background: rgba(255, 122, 0, 0.08);
+      border: 1px solid rgba(255, 122, 0, 0.3);
+    }
+
+    .status.error {
+      color: #ffc0c0;
+      background: rgba(255, 96, 96, 0.08);
+      border: 1px solid rgba(255, 96, 96, 0.28);
+    }
+
+    .status.success {
+      color: #a6ecd0;
+      background: rgba(37, 199, 131, 0.07);
+      border: 1px solid rgba(37, 199, 131, 0.28);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card {
+      padding: 13px 14px;
+      min-height: 82px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .summary-value {
+      margin-top: 7px;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-value.leading { color: var(--green); }
+    .summary-value.weakening { color: var(--yellow); }
+    .summary-value.lagging { color: var(--red); }
+    .summary-value.improving { color: var(--blue); }
+
+    .chart-panel {
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin: 2px 3px 10px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .chart-note {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+      line-height: 1.45;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 8.2;
+      min-height: 480px;
+      overflow: hidden;
+      border: 1px solid #222;
+      border-radius: 15px;
+      background: #080808;
+    }
+
+    #rrgChart {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .tooltip {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      min-width: 190px;
+      max-width: 260px;
+      padding: 10px 11px;
+      pointer-events: none;
+      border: 1px solid #3d3d3d;
+      border-radius: 10px;
+      background: rgba(8, 8, 8, 0.96);
+      box-shadow: 0 12px 30px rgba(0,0,0,.38);
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .tooltip strong {
+      color: var(--orange);
+      font-size: 12px;
+    }
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .table-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-title {
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .table-note {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #202020;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #101010;
+      color: #bdbdbd;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.55px;
+    }
+
+    tbody tr:hover {
+      background: #151515;
+    }
+
+    .ticker {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .badge.leading {
+      color: #9ce7c7;
+      background: rgba(37,199,131,.1);
+      border: 1px solid rgba(37,199,131,.28);
+    }
+
+    .badge.weakening {
+      color: #ffe19a;
+      background: rgba(246,200,95,.09);
+      border: 1px solid rgba(246,200,95,.27);
+    }
+
+    .badge.lagging {
+      color: #ffb4b4;
+      background: rgba(255,96,96,.09);
+      border: 1px solid rgba(255,96,96,.26);
+    }
+
+    .badge.improving {
+      color: #afd3ff;
+      background: rgba(90,167,255,.09);
+      border: 1px solid rgba(90,167,255,.25);
+    }
+
+    .direction-arrow {
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 20px;
+      color: #6f6f6f;
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 1150px) {
+      .control-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .tickers-field {
+        grid-column: span 3;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        width: min(100% - 18px, 1500px);
+        padding-top: 18px;
+      }
+
+      .header {
+        align-items: flex-start;
+      }
+
+      .method-pill {
+        display: none;
+      }
+
+      .control-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tickers-field {
+        grid-column: span 2;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .chart-wrap {
+        min-height: 500px;
+        aspect-ratio: auto;
+        height: 70vh;
+      }
+
+      .chart-header {
+        display: block;
+      }
+
+      .chart-note {
+        margin-top: 5px;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">OQ</div>
+        <div>
+          <h1>Relative Rotation</h1>
+          <div class="subtitle">
+            Relative strength and momentum versus a selected benchmark.
+          </div>
+        </div>
+      </div>
+
+      <div class="method-pill">
+        OQLIV Rotation v1
+      </div>
+    </header>
+
+    <section class="panel controls">
+      <form id="controlForm">
+        <div class="control-grid">
+          <div class="field">
+            <label for="benchmark">Benchmark</label>
+            <input id="benchmark" value="SOXX" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="field tickers-field">
+            <label for="tickers">Tickers</label>
+            <input
+              id="tickers"
+              value="NVDA,MU,SNDK,AMD,AVGO"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="field">
+            <label for="period">Period</label>
+            <select id="period">
+              <option value="1y">1 year</option>
+              <option value="2y" selected>2 years</option>
+              <option value="5y">5 years</option>
+              <option value="10y">10 years</option>
+              <option value="max">Maximum</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="ratioWindow">RS window</label>
+            <input id="ratioWindow" type="number" min="20" max="156" value="52" />
+          </div>
+
+          <div class="field">
+            <label for="momentumWeeks">Momentum</label>
+            <input id="momentumWeeks" type="number" min="1" max="26" value="4" />
+          </div>
+
+          <div class="field">
+            <label for="trailWeeks">Trail</label>
+            <input id="trailWeeks" type="number" min="2" max="26" value="8" />
+          </div>
+
+          <button id="loadButton" class="load-button" type="submit">
+            Load Rotation
+          </button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="summary-grid">
+      <article class="panel summary-card">
+        <div class="summary-label">Benchmark</div>
+        <div id="summaryBenchmark" class="summary-value">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Leading</div>
+        <div id="summaryLeading" class="summary-value leading">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Improving</div>
+        <div id="summaryImproving" class="summary-value improving">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Weakening</div>
+        <div id="summaryWeakening" class="summary-value weakening">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Lagging</div>
+        <div id="summaryLagging" class="summary-value lagging">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">As of</div>
+        <div id="summaryAsof" class="summary-value">—</div>
+      </article>
+    </section>
+
+    <section class="panel chart-panel">
+      <div class="chart-header">
+        <div class="chart-title">
+          Rotation Map
+        </div>
+
+        <div class="chart-note">
+          X = normalized relative strength · Y = 4-week relative momentum · center = 100 / 100
+        </div>
+      </div>
+
+      <div id="chartWrap" class="chart-wrap">
+        <svg id="rrgChart" aria-label="Relative rotation chart"></svg>
+        <div id="tooltip" class="tooltip"></div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="table-head">
+        <div class="table-title">Current Rotation State</div>
+        <div id="tableNote" class="table-note">—</div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Quadrant</th>
+              <th>Phase</th>
+              <th>Direction</th>
+              <th>Speed</th>
+              <th>RS Ratio</th>
+              <th>RS Momentum</th>
+              <th>Δ RS</th>
+              <th>Δ Momentum</th>
+              <th>Distance</th>
+              <th>As of</th>
+            </tr>
+          </thead>
+          <tbody id="rotationRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      OQLIV relative-rotation model. This is a transparent relative-strength model and is not the proprietary JdK RRG formula.
+    </footer>
+  </main>
+
+  <script>
+    const API_ENDPOINT =
+      "https://www.oqliv.com/performance/api/json/relative-rotation";
+
+    const NS = "http://www.w3.org/2000/svg";
+
+    const colors = {
+      Leading: "#25c783",
+      Weakening: "#f6c85f",
+      Lagging: "#ff6060",
+      Improving: "#5aa7ff"
+    };
+
+    const controlForm =
+      document.getElementById("controlForm");
+
+    const benchmarkInput =
+      document.getElementById("benchmark");
+
+    const tickersInput =
+      document.getElementById("tickers");
+
+    const periodInput =
+      document.getElementById("period");
+
+    const ratioWindowInput =
+      document.getElementById("ratioWindow");
+
+    const momentumWeeksInput =
+      document.getElementById("momentumWeeks");
+
+    const trailWeeksInput =
+      document.getElementById("trailWeeks");
+
+    const loadButton =
+      document.getElementById("loadButton");
+
+    const statusBox =
+      document.getElementById("status");
+
+    const svg =
+      document.getElementById("rrgChart");
+
+    const chartWrap =
+      document.getElementById("chartWrap");
+
+    const tooltip =
+      document.getElementById("tooltip");
+
+    let latestPayload = null;
+
+    function normalizeTicker(value) {
+      return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+    }
+
+    function normalizeTickerList(value) {
+      return String(value || "")
+        .split(",")
+        .map(normalizeTicker)
+        .filter(Boolean)
+        .join(",");
+    }
+
+    function setStatus(message, type = "") {
+      statusBox.textContent = message;
+      statusBox.className = "status";
+
+      if (message) {
+        statusBox.classList.add("visible");
+      }
+
+      if (type) {
+        statusBox.classList.add(type);
+      }
+    }
+
+    function formatNumber(value, decimals = 2) {
+      const number = Number(value);
+
+      if (!Number.isFinite(number)) {
+        return "—";
+      }
+
+      return number.toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        }
+      );
+    }
+
+    function buildUrl() {
+      const benchmark =
+        normalizeTicker(benchmarkInput.value);
+
+      const tickers =
+        normalizeTickerList(tickersInput.value);
+
+      benchmarkInput.value = benchmark;
+      tickersInput.value = tickers;
+
+      const query =
+        new URLSearchParams({
+          benchmark,
+          tickers,
+          period: periodInput.value,
+          interval: "1wk",
+          ratio_window: ratioWindowInput.value,
+          momentum_weeks: momentumWeeksInput.value,
+          trail: trailWeeksInput.value
+        });
+
+      return `${API_ENDPOINT}?${query.toString()}`;
+    }
+
+    async function parseResponse(response) {
+      const raw = await response.text();
+
+      let payload;
+
+      try {
+        payload = JSON.parse(raw);
+      } catch (error) {
+        throw new Error(
+          `Server returned non-JSON data. HTTP ${response.status}.`
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+          payload.detail ||
+          `HTTP ${response.status}`
+        );
+      }
+
+      return payload;
+    }
+
+    function svgElement(tag, attrs = {}) {
+      const el = document.createElementNS(NS, tag);
+
+      Object.entries(attrs).forEach(
+        ([key, value]) => {
+          el.setAttribute(key, String(value));
+        }
+      );
+
+      return el;
+    }
+
+    function appendText(
+      parent,
+      text,
+      x,
+      y,
+      attrs = {}
+    ) {
+      const el = svgElement(
+        "text",
+        {
+          x,
+          y,
+          ...attrs
+        }
+      );
+
+      el.textContent = text;
+      parent.appendChild(el);
+
+      return el;
+    }
+
+    function getAllPoints(members) {
+      const points = [];
+
+      members.forEach(member => {
+        (member.trail || []).forEach(point => {
+          const x = Number(point.x);
+          const y = Number(point.y);
+
+          if (
+            Number.isFinite(x) &&
+            Number.isFinite(y)
+          ) {
+            points.push({ x, y });
+          }
+        });
+      });
+
+      points.push({ x: 100, y: 100 });
+
+      return points;
+    }
+
+    function paddedDomain(values, center = 100) {
+      let min = Math.min(...values, center);
+      let max = Math.max(...values, center);
+
+      if (!Number.isFinite(min) || !Number.isFinite(max)) {
+        return [80, 120];
+      }
+
+      let span = max - min;
+
+      if (span < 10) {
+        span = 10;
+      }
+
+      const pad = span * 0.12;
+
+      min -= pad;
+      max += pad;
+
+      return [min, max];
+    }
+
+    function niceTicks(min, max, targetCount = 7) {
+      const span = max - min;
+
+      if (!(span > 0)) {
+        return [min];
+      }
+
+      const rawStep = span / targetCount;
+      const magnitude =
+        Math.pow(
+          10,
+          Math.floor(
+            Math.log10(rawStep)
+          )
+        );
+
+      const residual =
+        rawStep / magnitude;
+
+      let niceResidual = 1;
+
+      if (residual >= 5) {
+        niceResidual = 5;
+      } else if (residual >= 2) {
+        niceResidual = 2;
+      }
+
+      const step =
+        niceResidual * magnitude;
+
+      const start =
+        Math.ceil(min / step) * step;
+
+      const ticks = [];
+
+      for (
+        let value = start;
+        value <= max + step * 0.25;
+        value += step
+      ) {
+        ticks.push(value);
+      }
+
+      return ticks;
+    }
+
+    function showTooltip(event, member, point = null) {
+      const current = point || {
+        x: member.rs_ratio,
+        y: member.rs_momentum,
+        date: member.asof
+      };
+
+      tooltip.innerHTML = `
+        <strong>${member.ticker}</strong><br>
+        ${member.quadrant} · ${member.phase}<br>
+        RS Ratio: ${formatNumber(current.x, 2)}<br>
+        RS Momentum: ${formatNumber(current.y, 2)}<br>
+        ${current.date ? `Date: ${current.date}<br>` : ""}
+        Direction: ${member.direction_arrow || ""} ${member.direction || ""}<br>
+        Speed: ${member.speed || "—"}
+      `;
+
+      tooltip.style.display = "block";
+
+      const wrapRect =
+        chartWrap.getBoundingClientRect();
+
+      let left =
+        event.clientX -
+        wrapRect.left +
+        14;
+
+      let top =
+        event.clientY -
+        wrapRect.top +
+        14;
+
+      const width =
+        tooltip.offsetWidth;
+
+      const height =
+        tooltip.offsetHeight;
+
+      if (
+        left + width >
+        wrapRect.width - 8
+      ) {
+        left =
+          event.clientX -
+          wrapRect.left -
+          width -
+          14;
+      }
+
+      if (
+        top + height >
+        wrapRect.height - 8
+      ) {
+        top =
+          event.clientY -
+          wrapRect.top -
+          height -
+          14;
+      }
+
+      tooltip.style.left =
+        `${Math.max(8, left)}px`;
+
+      tooltip.style.top =
+        `${Math.max(8, top)}px`;
+    }
+
+    function hideTooltip() {
+      tooltip.style.display = "none";
+    }
+
+    function renderChart(payload) {
+      const members =
+        Array.isArray(payload.members)
+          ? payload.members
+          : [];
+
+      const width = 1400;
+      const height = 720;
+
+      const margin = {
+        top: 52,
+        right: 74,
+        bottom: 72,
+        left: 86
+      };
+
+      const plot = {
+        left: margin.left,
+        top: margin.top,
+        width:
+          width -
+          margin.left -
+          margin.right,
+        height:
+          height -
+          margin.top -
+          margin.bottom
+      };
+
+      svg.innerHTML = "";
+      svg.setAttribute(
+        "viewBox",
+        `0 0 ${width} ${height}`
+      );
+
+      if (!members.length) {
+        appendText(
+          svg,
+          "No valid members returned.",
+          width / 2,
+          height / 2,
+          {
+            fill: "#999",
+            "text-anchor": "middle",
+            "font-size": 16
+          }
+        );
+        return;
+      }
+
+      const points =
+        getAllPoints(members);
+
+      const [xMin, xMax] =
+        paddedDomain(
+          points.map(p => p.x)
+        );
+
+      const [yMin, yMax] =
+        paddedDomain(
+          points.map(p => p.y)
+        );
+
+      const sx = value =>
+        plot.left +
+        (
+          (value - xMin) /
+          (xMax - xMin)
+        ) *
+        plot.width;
+
+      const sy = value =>
+        plot.top +
+        plot.height -
+        (
+          (value - yMin) /
+          (yMax - yMin)
+        ) *
+        plot.height;
+
+      const centerX = sx(100);
+      const centerY = sy(100);
+
+      const bgGroup =
+        svgElement("g");
+
+      svg.appendChild(bgGroup);
+
+      const quadrantRects = [
+        {
+          x: plot.left,
+          y: plot.top,
+          width:
+            Math.max(
+              0,
+              centerX - plot.left
+            ),
+          height:
+            Math.max(
+              0,
+              centerY - plot.top
+            ),
+          fill:
+            "rgba(90,167,255,0.065)"
+        },
+        {
+          x: centerX,
+          y: plot.top,
+          width:
+            Math.max(
+              0,
+              plot.left +
+              plot.width -
+              centerX
+            ),
+          height:
+            Math.max(
+              0,
+              centerY - plot.top
+            ),
+          fill:
+            "rgba(37,199,131,0.065)"
+        },
+        {
+          x: plot.left,
+          y: centerY,
+          width:
+            Math.max(
+              0,
+              centerX - plot.left
+            ),
+          height:
+            Math.max(
+              0,
+              plot.top +
+              plot.height -
+              centerY
+            ),
+          fill:
+            "rgba(255,96,96,0.06)"
+        },
+        {
+          x: centerX,
+          y: centerY,
+          width:
+            Math.max(
+              0,
+              plot.left +
+              plot.width -
+              centerX
+            ),
+          height:
+            Math.max(
+              0,
+              plot.top +
+              plot.height -
+              centerY
+            ),
+          fill:
+            "rgba(246,200,95,0.06)"
+        }
+      ];
+
+      quadrantRects.forEach(rect => {
+        bgGroup.appendChild(
+          svgElement(
+            "rect",
+            rect
+          )
+        );
+      });
+
+      const gridGroup =
+        svgElement("g");
+
+      svg.appendChild(gridGroup);
+
+      const xTicks =
+        niceTicks(
+          xMin,
+          xMax,
+          8
+        );
+
+      const yTicks =
+        niceTicks(
+          yMin,
+          yMax,
+          7
+        );
+
+      xTicks.forEach(value => {
+        const x = sx(value);
+
+        gridGroup.appendChild(
+          svgElement(
+            "line",
+            {
+              x1: x,
+              y1: plot.top,
+              x2: x,
+              y2:
+                plot.top +
+                plot.height,
+              stroke: "#2b2b2b",
+              "stroke-width": 1
+            }
+          )
+        );
+
+        appendText(
+          gridGroup,
+          formatNumber(value, 0),
+          x,
+          plot.top +
+          plot.height +
+          27,
+          {
+            fill: "#818181",
+            "font-size": 11,
+            "text-anchor": "middle"
+          }
+        );
+      });
+
+      yTicks.forEach(value => {
+        const y = sy(value);
+
+        gridGroup.appendChild(
+          svgElement(
+            "line",
+            {
+              x1: plot.left,
+              y1: y,
+              x2:
+                plot.left +
+                plot.width,
+              y2: y,
+              stroke: "#2b2b2b",
+              "stroke-width": 1
+            }
+          )
+        );
+
+        appendText(
+          gridGroup,
+          formatNumber(value, 0),
+          plot.left - 13,
+          y + 4,
+          {
+            fill: "#818181",
+            "font-size": 11,
+            "text-anchor": "end"
+          }
+        );
+      });
+
+      const axisGroup =
+        svgElement("g");
+
+      svg.appendChild(axisGroup);
+
+      axisGroup.appendChild(
+        svgElement(
+          "line",
+          {
+            x1: centerX,
+            y1: plot.top,
+            x2: centerX,
+            y2:
+              plot.top +
+              plot.height,
+            stroke: "#9a9a9a",
+            "stroke-width": 1.5,
+            "stroke-dasharray": "7 7"
+          }
+        )
+      );
+
+      axisGroup.appendChild(
+        svgElement(
+          "line",
+          {
+            x1: plot.left,
+            y1: centerY,
+            x2:
+              plot.left +
+              plot.width,
+            y2: centerY,
+            stroke: "#9a9a9a",
+            "stroke-width": 1.5,
+            "stroke-dasharray": "7 7"
+          }
+        )
+      );
+
+      appendText(
+        svg,
+        "IMPROVING",
+        plot.left + 16,
+        plot.top + 29,
+        {
+          fill: colors.Improving,
+          "font-size": 18,
+          "font-weight": 900,
+          opacity: 0.74
+        }
+      );
+
+      appendText(
+        svg,
+        "LEADING",
+        plot.left +
+        plot.width -
+        16,
+        plot.top + 29,
+        {
+          fill: colors.Leading,
+          "font-size": 18,
+          "font-weight": 900,
+          "text-anchor": "end",
+          opacity: 0.74
+        }
+      );
+
+      appendText(
+        svg,
+        "LAGGING",
+        plot.left + 16,
+        plot.top +
+        plot.height -
+        18,
+        {
+          fill: colors.Lagging,
+          "font-size": 18,
+          "font-weight": 900,
+          opacity: 0.74
+        }
+      );
+
+      appendText(
+        svg,
+        "WEAKENING",
+        plot.left +
+        plot.width -
+        16,
+        plot.top +
+        plot.height -
+        18,
+        {
+          fill: colors.Weakening,
+          "font-size": 18,
+          "font-weight": 900,
+          "text-anchor": "end",
+          opacity: 0.74
+        }
+      );
+
+      appendText(
+        svg,
+        "Relative Strength Ratio",
+        plot.left +
+        plot.width / 2,
+        height - 19,
+        {
+          fill: "#bdbdbd",
+          "font-size": 12,
+          "font-weight": 750,
+          "text-anchor": "middle"
+        }
+      );
+
+      const yLabel =
+        appendText(
+          svg,
+          "Relative Momentum",
+          22,
+          plot.top +
+          plot.height / 2,
+          {
+            fill: "#bdbdbd",
+            "font-size": 12,
+            "font-weight": 750,
+            "text-anchor": "middle"
+          }
+        );
+
+      yLabel.setAttribute(
+        "transform",
+        `rotate(-90 22 ${
+          plot.top +
+          plot.height / 2
+        })`
+      );
+
+      members.forEach((member, memberIndex) => {
+        const trail =
+          (member.trail || [])
+          .filter(
+            p =>
+              Number.isFinite(Number(p.x)) &&
+              Number.isFinite(Number(p.y))
+          );
+
+        if (!trail.length) {
+          return;
+        }
+
+        const color =
+          colors[member.quadrant] ||
+          "#d8d8d8";
+
+        const g =
+          svgElement("g", {
+            "data-ticker":
+              member.ticker
+          });
+
+        svg.appendChild(g);
+
+        const pointString =
+          trail
+          .map(
+            point =>
+              `${sx(Number(point.x))},${
+                sy(Number(point.y))
+              }`
+          )
+          .join(" ");
+
+        g.appendChild(
+          svgElement(
+            "polyline",
+            {
+              points: pointString,
+              fill: "none",
+              stroke: color,
+              "stroke-width": 2.25,
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
+              opacity: 0.76
+            }
+          )
+        );
+
+        trail.forEach(
+          (point, index) => {
+            const px =
+              sx(Number(point.x));
+
+            const py =
+              sy(Number(point.y));
+
+            const isLatest =
+              index ===
+              trail.length - 1;
+
+            const circle =
+              svgElement(
+                "circle",
+                {
+                  cx: px,
+                  cy: py,
+                  r:
+                    isLatest
+                      ? 7.7
+                      : 3.4,
+                  fill:
+                    isLatest
+                      ? color
+                      : "#090909",
+                  stroke: color,
+                  "stroke-width":
+                    isLatest
+                      ? 2.3
+                      : 1.6,
+                  opacity:
+                    isLatest
+                      ? 1
+                      : 0.78,
+                  style:
+                    "cursor:pointer"
+                }
+              );
+
+            circle.addEventListener(
+              "mousemove",
+              event =>
+                showTooltip(
+                  event,
+                  member,
+                  point
+                )
+            );
+
+            circle.addEventListener(
+              "mouseleave",
+              hideTooltip
+            );
+
+            g.appendChild(circle);
+          }
+        );
+
+        const latest =
+          trail[trail.length - 1];
+
+        const latestX =
+          sx(Number(latest.x));
+
+        const latestY =
+          sy(Number(latest.y));
+
+        let labelDx = 11;
+        let labelAnchor = "start";
+
+        if (
+          latestX >
+          plot.left +
+          plot.width * 0.82
+        ) {
+          labelDx = -11;
+          labelAnchor = "end";
+        }
+
+        const label =
+          appendText(
+            g,
+            member.ticker,
+            latestX + labelDx,
+            latestY - 9,
+            {
+              fill: "#f7f7f7",
+              "font-size": 13,
+              "font-weight": 900,
+              "text-anchor":
+                labelAnchor,
+              style:
+                "paint-order:stroke;stroke:#080808;stroke-width:4px;stroke-linejoin:round;cursor:pointer"
+            }
+          );
+
+        label.addEventListener(
+          "mousemove",
+          event =>
+            showTooltip(
+              event,
+              member
+            )
+        );
+
+        label.addEventListener(
+          "mouseleave",
+          hideTooltip
+        );
+      });
+
+      svg.appendChild(
+        svgElement(
+          "rect",
+          {
+            x: plot.left,
+            y: plot.top,
+            width: plot.width,
+            height: plot.height,
+            fill: "none",
+            stroke: "#454545",
+            "stroke-width": 1
+          }
+        )
+      );
+    }
+
+    function renderSummary(payload) {
+      const metadata =
+        payload.metadata || {};
+
+      const counts =
+        metadata.quadrant_counts || {};
+
+      document.getElementById(
+        "summaryBenchmark"
+      ).textContent =
+        metadata.benchmark || "—";
+
+      document.getElementById(
+        "summaryLeading"
+      ).textContent =
+        counts.Leading ?? 0;
+
+      document.getElementById(
+        "summaryImproving"
+      ).textContent =
+        counts.Improving ?? 0;
+
+      document.getElementById(
+        "summaryWeakening"
+      ).textContent =
+        counts.Weakening ?? 0;
+
+      document.getElementById(
+        "summaryLagging"
+      ).textContent =
+        counts.Lagging ?? 0;
+
+      const members =
+        payload.members || [];
+
+      const asof =
+        members
+          .map(m => m.asof)
+          .filter(Boolean)
+          .sort()
+          .at(-1);
+
+      document.getElementById(
+        "summaryAsof"
+      ).textContent =
+        asof || "—";
+
+      document.getElementById(
+        "tableNote"
+      ).textContent =
+        `${metadata.valid_members ?? members.length} valid · ${metadata.failed_members ?? 0} failed · ${metadata.price_fetches ?? "—"} price fetch`;
+    }
+
+    function renderTable(payload) {
+      const tbody =
+        document.getElementById(
+          "rotationRows"
+        );
+
+      tbody.innerHTML = "";
+
+      const members =
+        Array.isArray(payload.members)
+          ? payload.members
+          : [];
+
+      members.forEach(member => {
+        const tr =
+          document.createElement("tr");
+
+        const quadrantClass =
+          String(
+            member.quadrant || ""
+          )
+          .toLowerCase();
+
+        tr.innerHTML = `
+          <td class="ticker">${member.ticker || "—"}</td>
+          <td>
+            <span class="badge ${quadrantClass}">
+              ${member.quadrant || "—"}
+            </span>
+          </td>
+          <td>${member.phase || "—"}</td>
+          <td>
+            <span class="direction-arrow">
+              ${member.direction_arrow || ""}
+            </span>
+            ${member.direction || "—"}
+          </td>
+          <td>${member.speed || "—"}</td>
+          <td>${formatNumber(member.rs_ratio, 2)}</td>
+          <td>${formatNumber(member.rs_momentum, 2)}</td>
+          <td>${formatNumber(member.dx, 2)}</td>
+          <td>${formatNumber(member.dy, 2)}</td>
+          <td>${formatNumber(member.distance_from_center, 2)}</td>
+          <td class="muted">${member.asof || "—"}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function render(payload) {
+      latestPayload = payload;
+      renderSummary(payload);
+      renderChart(payload);
+      renderTable(payload);
+    }
+
+    async function loadRotation(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      const benchmark =
+        normalizeTicker(
+          benchmarkInput.value
+        );
+
+      const tickers =
+        normalizeTickerList(
+          tickersInput.value
+        );
+
+      if (!benchmark) {
+        setStatus(
+          "Enter a benchmark.",
+          "error"
+        );
+        return;
+      }
+
+      if (!tickers) {
+        setStatus(
+          "Enter at least one member ticker.",
+          "error"
+        );
+        return;
+      }
+
+      loadButton.disabled = true;
+
+      setStatus(
+        "Loading relative rotation...",
+        "loading"
+      );
+
+      try {
+        const response =
+          await fetch(
+            buildUrl(),
+            {
+              method: "GET",
+              cache: "no-store",
+              headers: {
+                Accept: "application/json"
+              }
+            }
+          );
+
+        const payload =
+          await parseResponse(
+            response
+          );
+
+        render(payload);
+
+        const errors =
+          Array.isArray(payload.errors)
+            ? payload.errors
+            : [];
+
+        if (errors.length) {
+          setStatus(
+            `Loaded with ${errors.length} ticker error(s).`,
+            "success"
+          );
+        } else {
+          setStatus(
+            "Rotation data loaded successfully.",
+            "success"
+          );
+        }
+
+      } catch (error) {
+        console.error(error);
+
+        setStatus(
+          error.message ||
+          "Unable to load rotation data.",
+          "error"
+        );
+
+      } finally {
+        loadButton.disabled = false;
+      }
+    }
+
+    controlForm.addEventListener(
+      "submit",
+      loadRotation
+    );
+
+    benchmarkInput.addEventListener(
+      "input",
+      function () {
+        this.value =
+          normalizeTicker(
+            this.value
+          );
+      }
+    );
+
+    tickersInput.addEventListener(
+      "input",
+      function () {
+        this.value =
+          this.value.toUpperCase();
+      }
+    );
+
+    window.addEventListener(
+      "resize",
+      () => {
+        if (latestPayload) {
+          renderChart(
+            latestPayload
+          );
+        }
+      }
+    );
+
+    loadRotation();
+  </script>
+</body>
+</html>
