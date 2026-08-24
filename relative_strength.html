@@ -701,6 +701,51 @@
     const TICKERS_STORAGE_KEY =
       "oqliv.relativeRotation.tickers";
 
+    const BENCHMARK_STORAGE_KEY =
+      "oqliv.relativeRotation.benchmark";
+
+    function loadSavedBenchmark() {
+      try {
+        const saved =
+          localStorage.getItem(
+            BENCHMARK_STORAGE_KEY
+          );
+
+        if (saved) {
+          benchmarkInput.value =
+            saved;
+        }
+      } catch (error) {
+        console.warn(
+          "Unable to read saved benchmark:",
+          error
+        );
+      }
+    }
+
+    function saveBenchmark(value) {
+      try {
+        const normalized =
+          normalizeTicker(value);
+
+        if (normalized) {
+          localStorage.setItem(
+            BENCHMARK_STORAGE_KEY,
+            normalized
+          );
+        } else {
+          localStorage.removeItem(
+            BENCHMARK_STORAGE_KEY
+          );
+        }
+      } catch (error) {
+        console.warn(
+          "Unable to save benchmark:",
+          error
+        );
+      }
+    }
+
     function loadSavedTickers() {
       try {
         const saved =
@@ -796,6 +841,7 @@
 
       benchmarkInput.value = benchmark;
       tickersInput.value = tickers;
+      saveBenchmark(benchmark);
       saveTickers(tickers);
 
       const query =
@@ -1815,6 +1861,10 @@
           normalizeTicker(
             this.value
           );
+
+        saveBenchmark(
+          this.value
+        );
       }
     );
 
@@ -1841,6 +1891,7 @@
       }
     );
 
+    loadSavedBenchmark();
     loadSavedTickers();
     loadRotation();
   </script>
