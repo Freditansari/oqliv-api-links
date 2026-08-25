@@ -283,57 +283,6 @@
       line-height: 1.45;
     }
 
-    .ticker-visibility {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 0 3px 12px;
-    }
-
-    .ticker-toggle-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      min-width: 0;
-    }
-
-    .ticker-toggle,
-    .ticker-toggle-action {
-      min-height: 34px;
-      padding: 7px 10px;
-      border: 1px solid #343434;
-      border-radius: 999px;
-      background: #0a0a0a;
-      color: #777;
-      font-size: 11px;
-      font-weight: 850;
-      cursor: pointer;
-      transition: border-color .15s ease, color .15s ease, background .15s ease, opacity .15s ease;
-    }
-
-    .ticker-toggle:hover,
-    .ticker-toggle-action:hover {
-      border-color: #555;
-      color: #d8d8d8;
-    }
-
-    .ticker-toggle.active {
-      border-color: rgba(255, 122, 0, 0.62);
-      background: rgba(255, 122, 0, 0.11);
-      color: #ffd0a1;
-    }
-
-    .ticker-toggle-actions {
-      display: flex;
-      flex-shrink: 0;
-      gap: 7px;
-    }
-
-    .ticker-toggle-action {
-      color: #b8b8b8;
-    }
-
     .chart-wrap {
       position: relative;
       width: 100%;
@@ -528,9 +477,9 @@
       }
 
       .chart-wrap {
-        min-height: 0;
-        height: auto;
-        aspect-ratio: 9 / 16;
+        min-height: 500px;
+        aspect-ratio: auto;
+        height: 70vh;
       }
 
       .chart-header {
@@ -540,25 +489,6 @@
       .chart-note {
         margin-top: 5px;
         text-align: left;
-      }
-
-      .ticker-visibility {
-        display: block;
-        margin-top: 11px;
-      }
-
-      .ticker-toggle-list {
-        gap: 6px;
-      }
-
-      .ticker-toggle,
-      .ticker-toggle-action {
-        min-height: 36px;
-        padding: 8px 11px;
-      }
-
-      .ticker-toggle-actions {
-        margin-top: 8px;
       }
     }
   </style>
@@ -678,14 +608,6 @@
         </div>
       </div>
 
-      <div class="ticker-visibility" aria-label="Chart ticker visibility controls">
-        <div id="tickerToggles" class="ticker-toggle-list"></div>
-        <div class="ticker-toggle-actions">
-          <button id="showAllTickers" class="ticker-toggle-action" type="button">Show all</button>
-          <button id="hideAllTickers" class="ticker-toggle-action" type="button">Hide all</button>
-        </div>
-      </div>
-
       <div id="chartWrap" class="chart-wrap">
         <svg id="rrgChart" aria-label="Relative rotation chart"></svg>
         <div id="tooltip" class="tooltip"></div>
@@ -774,17 +696,7 @@
     const tooltip =
       document.getElementById("tooltip");
 
-    const tickerToggles =
-      document.getElementById("tickerToggles");
-
-    const showAllTickersButton =
-      document.getElementById("showAllTickers");
-
-    const hideAllTickersButton =
-      document.getElementById("hideAllTickers");
-
     let latestPayload = null;
-    let hiddenTickers = new Set();
 
     const TICKERS_STORAGE_KEY =
       "oqliv.relativeRotation.tickers";
@@ -1165,111 +1077,21 @@
       tooltip.style.display = "none";
     }
 
-    function getPayloadMembers(payload) {
-      return Array.isArray(payload?.members)
-        ? payload.members
-        : [];
-    }
-
-    function getVisibleMembers(payload) {
-      return getPayloadMembers(payload)
-        .filter(member =>
-          !hiddenTickers.has(
-            normalizeTicker(member.ticker)
-          )
-        );
-    }
-
-    function renderTickerToggles(payload) {
-      const members = getPayloadMembers(payload);
-      const validTickers = new Set(
-        members.map(member =>
-          normalizeTicker(member.ticker)
-        )
-      );
-
-      hiddenTickers = new Set(
-        [...hiddenTickers].filter(ticker =>
-          validTickers.has(ticker)
-        )
-      );
-
-      tickerToggles.innerHTML = "";
-
-      members.forEach(member => {
-        const ticker = normalizeTicker(member.ticker);
-        if (!ticker) return;
-
-        const button = document.createElement("button");
-        const isVisible = !hiddenTickers.has(ticker);
-
-        button.type = "button";
-        button.className = `ticker-toggle${isVisible ? " active" : ""}`;
-        button.textContent = ticker;
-        button.setAttribute(
-          "aria-pressed",
-          isVisible ? "true" : "false"
-        );
-        button.title = isVisible
-          ? `Hide ${ticker} from chart`
-          : `Show ${ticker} on chart`;
-
-        button.addEventListener("click", () => {
-          if (hiddenTickers.has(ticker)) {
-            hiddenTickers.delete(ticker);
-          } else {
-            hiddenTickers.add(ticker);
-          }
-
-          renderTickerToggles(payload);
-          renderChart(payload);
-        });
-
-        tickerToggles.appendChild(button);
-      });
-
-      const visibleCount =
-        members.length - hiddenTickers.size;
-
-      showAllTickersButton.disabled =
-        members.length === 0 || visibleCount === members.length;
-
-      hideAllTickersButton.disabled =
-        members.length === 0 || visibleCount === 0;
-    }
-
     function renderChart(payload) {
       const members =
-        getVisibleMembers(payload);
+        Array.isArray(payload.members)
+          ? payload.members
+          : [];
 
-      const isMobile =
-        window.matchMedia(
-          "(max-width: 720px)"
-        ).matches;
+      const width = 1400;
+      const height = 720;
 
-      const width = isMobile ? 720 : 1400;
-      const height = isMobile ? 1280 : 720;
-
-      const margin = isMobile
-        ? {
-            top: 76,
-            right: 54,
-            bottom: 100,
-            left: 92
-          }
-        : {
-            top: 52,
-            right: 74,
-            bottom: 72,
-            left: 86
-          };
-
-      const tickFontSize = isMobile ? 18 : 11;
-      const quadrantFontSize = isMobile ? 27 : 18;
-      const axisFontSize = isMobile ? 19 : 12;
-      const memberFontSize = isMobile ? 22 : 13;
-      const latestRadius = isMobile ? 11.5 : 7.7;
-      const trailRadius = isMobile ? 5.2 : 3.4;
+      const margin = {
+        top: 52,
+        right: 74,
+        bottom: 72,
+        left: 86
+      };
 
       const plot = {
         left: margin.left,
@@ -1291,20 +1113,15 @@
       );
 
       if (!members.length) {
-        const hasLoadedMembers =
-          getPayloadMembers(payload).length > 0;
-
         appendText(
           svg,
-          hasLoadedMembers
-            ? "All tickers are hidden. Tap a ticker above to show it."
-            : "No valid members returned.",
+          "No valid members returned.",
           width / 2,
           height / 2,
           {
             fill: "#999",
             "text-anchor": "middle",
-            "font-size": isMobile ? 20 : 16
+            "font-size": 16
           }
         );
         return;
@@ -1441,14 +1258,14 @@
         niceTicks(
           xMin,
           xMax,
-          isMobile ? 5 : 8
+          8
         );
 
       const yTicks =
         niceTicks(
           yMin,
           yMax,
-          isMobile ? 9 : 7
+          7
         );
 
       xTicks.forEach(value => {
@@ -1479,7 +1296,7 @@
           27,
           {
             fill: "#818181",
-            "font-size": tickFontSize,
+            "font-size": 11,
             "text-anchor": "middle"
           }
         );
@@ -1511,7 +1328,7 @@
           y + 4,
           {
             fill: "#818181",
-            "font-size": tickFontSize,
+            "font-size": 11,
             "text-anchor": "end"
           }
         );
@@ -1563,7 +1380,7 @@
         plot.top + 29,
         {
           fill: colors.Improving,
-          "font-size": quadrantFontSize,
+          "font-size": 18,
           "font-weight": 900,
           opacity: 0.74
         }
@@ -1578,7 +1395,7 @@
         plot.top + 29,
         {
           fill: colors.Leading,
-          "font-size": quadrantFontSize,
+          "font-size": 18,
           "font-weight": 900,
           "text-anchor": "end",
           opacity: 0.74
@@ -1594,7 +1411,7 @@
         18,
         {
           fill: colors.Lagging,
-          "font-size": quadrantFontSize,
+          "font-size": 18,
           "font-weight": 900,
           opacity: 0.74
         }
@@ -1611,7 +1428,7 @@
         18,
         {
           fill: colors.Weakening,
-          "font-size": quadrantFontSize,
+          "font-size": 18,
           "font-weight": 900,
           "text-anchor": "end",
           opacity: 0.74
@@ -1626,7 +1443,7 @@
         height - 19,
         {
           fill: "#bdbdbd",
-          "font-size": axisFontSize,
+          "font-size": 12,
           "font-weight": 750,
           "text-anchor": "middle"
         }
@@ -1641,7 +1458,7 @@
           plot.height / 2,
           {
             fill: "#bdbdbd",
-            "font-size": axisFontSize,
+            "font-size": 12,
             "font-weight": 750,
             "text-anchor": "middle"
           }
@@ -1725,8 +1542,8 @@
                   cy: py,
                   r:
                     isLatest
-                      ? latestRadius
-                      : trailRadius,
+                      ? 7.7
+                      : 3.4,
                   fill:
                     isLatest
                       ? color
@@ -1773,7 +1590,7 @@
         const latestY =
           sy(Number(latest.y));
 
-        let labelDx = isMobile ? 16 : 11;
+        let labelDx = 11;
         let labelAnchor = "start";
 
         if (
@@ -1781,7 +1598,7 @@
           plot.left +
           plot.width * 0.82
         ) {
-          labelDx = isMobile ? -16 : -11;
+          labelDx = -11;
           labelAnchor = "end";
         }
 
@@ -1790,10 +1607,10 @@
             g,
             member.ticker,
             latestX + labelDx,
-            latestY - (isMobile ? 14 : 9),
+            latestY - 9,
             {
               fill: "#f7f7f7",
-              "font-size": memberFontSize,
+              "font-size": 13,
               "font-weight": 900,
               "text-anchor":
                 labelAnchor,
@@ -1939,7 +1756,6 @@
     function render(payload) {
       latestPayload = payload;
       renderSummary(payload);
-      renderTickerToggles(payload);
       renderChart(payload);
       renderTable(payload);
     }
@@ -2061,35 +1877,6 @@
         saveTickers(
           this.value
         );
-      }
-    );
-
-    showAllTickersButton.addEventListener(
-      "click",
-      () => {
-        hiddenTickers.clear();
-        if (latestPayload) {
-          renderTickerToggles(latestPayload);
-          renderChart(latestPayload);
-        }
-      }
-    );
-
-    hideAllTickersButton.addEventListener(
-      "click",
-      () => {
-        if (!latestPayload) return;
-
-        hiddenTickers = new Set(
-          getPayloadMembers(latestPayload)
-            .map(member =>
-              normalizeTicker(member.ticker)
-            )
-            .filter(Boolean)
-        );
-
-        renderTickerToggles(latestPayload);
-        renderChart(latestPayload);
       }
     );
 
