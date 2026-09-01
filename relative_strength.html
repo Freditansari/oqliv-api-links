@@ -3,8 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="OQLIV Relative Rotation dashboard" />
-  <title>OQLIV Relative Rotation</title>
+
+  <!-- Primary SEO -->
+  <title>Momentum Dashboard</title>
+  <meta
+    name="title"
+    content="Momentum Dashboard"
+  />
+  <meta
+    name="description"
+    content="Compare stocks momentum"
+  />
+  <meta
+    name="keywords"
+    content="relative rotation, relative rotation graph, RRG, stock rotation, sector rotation, relative strength, stock momentum, leading stocks, improving stocks, weakening stocks, lagging stocks, market leadership, OQLIV"
+  />
+  <meta name="author" content="OQLIV" />
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  />
+  <meta name="theme-color" content="#050505" />
+  <link rel="canonical" href="https://oqliv.com/momentum" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="OQLIV" />
+  <meta
+    property="og:title"
+    content="OQLIV Momentum Dashboard"
+  />
+  <meta
+    property="og:description"
+    content="See which stocks are leading, improving, weakening, or lagging versus your benchmark with OQLIV Relative Rotation."
+  />
+  <meta property="og:url" content="https://oqliv.com/momentum" />
+  <meta property="og:image" content="https://oqliv.com/static/og-default.jpg" />
+  <meta
+    property="og:image:alt"
+    content="OQLIV Momentum dashboard"
+  />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta
+    name="twitter:title"
+    content="OQLIV Stock Market Momentum Dashboard"
+  />
+  <meta
+    name="twitter:description"
+    content="Track stock momentum in our dashboard."
+  />
+  <meta name="twitter:image" content="https://oqliv.com/static/og-default.jpg" />
+  <meta
+    name="twitter:image:alt"
+    content="OQLIV momentum dashboard showing stock leadership and momentum"
+  />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "OQLIV Momentum dashboard",
+    "url": "https://oqliv.com/momentum",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "description": "A Momentum dashboard  for comparing stock leadership and momentum against a selected benchmark.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "OQLIV",
+      "url": "https://oqliv.com/"
+    }
+  }
+  </script>
+
+  <!-- Analytics: add your IDs below if this page is not already covered site-wide. -->
+  <script>
+    window.OQLIV_ANALYTICS_CONFIG = {
+      ga4MeasurementId: "G-VPH9J11PEH",
+      metaPixelId: "423687977221560"
+    };
+
+    (function initOqlivAnalytics() {
+      const config = window.OQLIV_ANALYTICS_CONFIG || {};
+
+      if (config.ga4MeasurementId && typeof window.gtag !== "function") {
+        const gaScript = document.createElement("script");
+        gaScript.async = true;
+        gaScript.src =
+          `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(config.ga4MeasurementId)}`;
+        document.head.appendChild(gaScript);
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () {
+          window.dataLayer.push(arguments);
+        };
+        window.gtag("js", new Date());
+        window.gtag("config", config.ga4MeasurementId);
+      }
+
+      if (config.metaPixelId && typeof window.fbq !== "function") {
+        const fbq = window.fbq = function () {
+          fbq.callMethod
+            ? fbq.callMethod.apply(fbq, arguments)
+            : fbq.queue.push(arguments);
+        };
+
+        if (!window._fbq) window._fbq = fbq;
+        fbq.push = fbq;
+        fbq.loaded = true;
+        fbq.version = "2.0";
+        fbq.queue = [];
+
+        const metaScript = document.createElement("script");
+        metaScript.async = true;
+        metaScript.src = "https://connect.facebook.net/en_US/fbevents.js";
+        document.head.appendChild(metaScript);
+
+        window.fbq("init", config.metaPixelId);
+        window.fbq("track", "PageView");
+      }
+    })();
+  </script>
 
   <style>
     :root {
@@ -437,6 +559,18 @@
       font-size: 13px;
     }
 
+    .ticker-link {
+      color: inherit;
+      font-weight: inherit;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 122, 0, 0.55);
+    }
+
+    .ticker-link:hover {
+      color: var(--orange);
+      border-bottom-color: var(--orange);
+    }
+
     .badge {
       display: inline-flex;
       align-items: center;
@@ -565,6 +699,12 @@
 </head>
 
 <body>
+  <!-- Meta Pixel noscript fallback -->
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=423687977221560&ev=PageView&noscript=1"
+         alt="" />
+  </noscript>
   <main class="container">
     <header class="header">
       <div class="brand">
@@ -687,7 +827,7 @@
       </div>
 
       <div id="chartWrap" class="chart-wrap">
-        <svg id="rrgChart" aria-label="Relative rotation chart"></svg>
+        <svg id="rrgChart" aria-label="Momentum chart"></svg>
         <div id="tooltip" class="tooltip"></div>
       </div>
     </section>
@@ -737,6 +877,16 @@
       Lagging: "#ff6060",
       Improving: "#5aa7ff"
     };
+
+    function trackAnalyticsEvent(eventName, params = {}) {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", eventName, params);
+      }
+
+      if (typeof window.fbq === "function") {
+        window.fbq("trackCustom", eventName, params);
+      }
+    }
 
     const controlForm =
       document.getElementById("controlForm");
@@ -1909,8 +2059,17 @@
           )
           .toLowerCase();
 
+        const ticker = normalizeTicker(member.ticker);
+        const trendReportUrl = ticker
+          ? `https://oqliv.com/trend-report?ticker=${encodeURIComponent(ticker)}`
+          : "";
+
         tr.innerHTML = `
-          <td class="ticker">${member.ticker || "—"}</td>
+          <td class="ticker">
+            ${ticker
+              ? `<a class="ticker-link" href="${trendReportUrl}" target="_blank" rel="noopener noreferrer">${ticker}</a>`
+              : "—"}
+          </td>
           <td>
             <span class="badge ${quadrantClass}">
               ${member.quadrant || "—"}
@@ -1933,6 +2092,25 @@
         `;
 
         tbody.appendChild(tr);
+
+        const tickerLink =
+          tr.querySelector(".ticker-link");
+
+        if (tickerLink) {
+          tickerLink.addEventListener(
+            "click",
+            () => {
+              trackAnalyticsEvent(
+                "trend_report_click",
+                {
+                  ticker,
+                  quadrant: member.quadrant || "unknown",
+                  phase: member.phase || "unknown"
+                }
+              );
+            }
+          );
+        }
       });
     }
 
@@ -1975,6 +2153,21 @@
         return;
       }
 
+      trackAnalyticsEvent(
+        "relative_rotation_load",
+        {
+          benchmark,
+          ticker_count: tickers
+            .split(",")
+            .filter(Boolean)
+            .length,
+          period: periodInput.value,
+          ratio_window: Number(ratioWindowInput.value),
+          momentum_weeks: Number(momentumWeeksInput.value),
+          trail_weeks: Number(trailWeeksInput.value)
+        }
+      );
+
       loadButton.disabled = true;
 
       setStatus(
@@ -2002,6 +2195,19 @@
 
         render(payload);
 
+        trackAnalyticsEvent(
+          "relative_rotation_loaded",
+          {
+            benchmark:
+              payload?.metadata?.benchmark || benchmark,
+            valid_members:
+              payload?.metadata?.valid_members ??
+              getPayloadMembers(payload).length,
+            failed_members:
+              payload?.metadata?.failed_members ?? 0
+          }
+        );
+
         const errors =
           Array.isArray(payload.errors)
             ? payload.errors
@@ -2021,6 +2227,16 @@
 
       } catch (error) {
         console.error(error);
+
+        trackAnalyticsEvent(
+          "relative_rotation_error",
+          {
+            benchmark,
+            message:
+              error?.message ||
+              "Unable to load rotation data."
+          }
+        );
 
         setStatus(
           error.message ||
@@ -2068,6 +2284,9 @@
       "click",
       () => {
         hiddenTickers.clear();
+        trackAnalyticsEvent(
+          "relative_rotation_show_all"
+        );
         if (latestPayload) {
           renderTickerToggles(latestPayload);
           renderChart(latestPayload);
@@ -2079,6 +2298,10 @@
       "click",
       () => {
         if (!latestPayload) return;
+
+        trackAnalyticsEvent(
+          "relative_rotation_hide_all"
+        );
 
         hiddenTickers = new Set(
           getPayloadMembers(latestPayload)
