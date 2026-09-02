@@ -697,6 +697,157 @@
       .industry-title { font-size:7px; }
     }
 
+  
+    /* =========================================================
+       CLEAN V2 — no overlay nav, no legend, screenshot friendly
+       ========================================================= */
+
+    .nav-arrow,
+    .carousel-footer,
+    .footer-note {
+      display: none !important;
+    }
+
+    .topbar {
+      min-height: 27px !important;
+      margin-bottom: 2px !important;
+      padding: 0 2px;
+    }
+
+    .brand {
+      gap: 5px !important;
+    }
+
+    .logo {
+      width: 21px !important;
+      height: 21px !important;
+      border-radius: 5px !important;
+      font-size: 8px !important;
+    }
+
+    h1 {
+      font-size: 10px !important;
+      font-weight: 850;
+    }
+
+    .subtitle,
+    .status-pill {
+      display: none !important;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-wrap: nowrap;
+    }
+
+    .page-mini {
+      color: rgba(200,215,220,.58);
+      font-size: 8px;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+      min-width: 21px;
+      text-align: right;
+      user-select: none;
+    }
+
+    .icon-btn {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 6px;
+      background: rgba(255,255,255,.025);
+      color: rgba(225,235,238,.62);
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .icon-btn:hover,
+    .icon-btn:focus-visible {
+      color: #fff;
+      border-color: rgba(255,122,0,.5);
+      background: rgba(255,122,0,.07);
+      outline: none;
+    }
+
+    .carousel {
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    /*
+     * Swipe works on touch. Pointer drag works on desktop.
+     * Browser pinch zoom remains available because touch-action stays auto.
+     */
+    .track {
+      cursor: grab;
+      touch-action: auto !important;
+      user-select: none;
+    }
+
+    .track.is-dragging {
+      cursor: grabbing;
+      scroll-snap-type: none !important;
+    }
+
+    .track.is-dragging a {
+      pointer-events: none;
+    }
+
+    /*
+     * Screenshot mode hides the ONLY remaining UI.
+     * It automatically returns after a few seconds.
+     */
+    body.capture-mode .topbar {
+      display: none !important;
+    }
+
+    body.capture-mode .shell {
+      padding: 0 !important;
+    }
+
+    body.capture-mode .carousel {
+      height: 100dvh;
+      min-height: 100dvh;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    body.capture-mode .slide {
+      padding: 0 !important;
+    }
+
+    body.capture-mode .industry-grid {
+      gap: 2px !important;
+    }
+
+    body.capture-mode .industry-card {
+      border-color: #020708 !important;
+    }
+
+    @media (max-width: 780px) {
+      .topbar {
+        min-height: 25px !important;
+      }
+
+      .page-mini {
+        font-size: 7.5px;
+      }
+
+      .icon-btn {
+        width: 21px;
+        height: 21px;
+        font-size: 10px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -716,33 +867,17 @@
       </div>
 
       <div class="top-actions">
-        <div id="statusPill" class="status-pill">Loading market data…</div>
-        <button id="refreshButton" class="refresh-btn" type="button">↻ Refresh</button>
+        <span id="pageMini" class="page-mini" aria-live="polite">1/9</span>
+        <button id="captureButton" class="icon-btn" type="button" aria-label="Hide controls for screenshot" title="Clean screenshot">◉</button>
+        <button id="refreshButton" class="icon-btn" type="button" aria-label="Refresh market data" title="Refresh">↻</button>
       </div>
     </header>
 
     <section class="carousel" aria-label="Industry drawdown carousel">
-      <button id="prevButton" class="nav-arrow prev" type="button" aria-label="Previous page">‹</button>
       <div id="track" class="track">
         <div class="loading"><div><strong>Building treemaps…</strong><br>Downloading the latest OQLIV drawdown data.</div></div>
       </div>
-      <button id="nextButton" class="nav-arrow next" type="button" aria-label="Next page">›</button>
     </section>
-
-    <div class="carousel-footer">
-      <div class="legend" aria-label="Drawdown color legend">
-        <span class="legend-item"><i class="swatch" style="background:#218d5d"></i> 0 to −10%</span>
-        <span class="legend-item"><i class="swatch" style="background:#d9aa29"></i> −10 to −20%</span>
-        <span class="legend-item"><i class="swatch" style="background:#f17a2b"></i> −20 to −35%</span>
-        <span class="legend-item"><i class="swatch" style="background:#dd3f47"></i> below −35%</span>
-      </div>
-
-      <div id="pager" class="pager" aria-label="Carousel pages"></div>
-    </div>
-
-    <div class="footer-note">
-      Industry headline drawdown is weighted by <strong>plot_size</strong>. Ticker rectangle area is proportional to <strong>plot_size</strong>. Tap a ticker to open its OQLIV Trend Report.
-    </div>
   </main>
 
   <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -765,11 +900,9 @@
       const MAX_INDUSTRIES = PAGE_COUNT * INDUSTRIES_PER_PAGE;
 
       const track = document.getElementById('track');
-      const pager = document.getElementById('pager');
-      const statusPill = document.getElementById('statusPill');
       const refreshButton = document.getElementById('refreshButton');
-      const prevButton = document.getElementById('prevButton');
-      const nextButton = document.getElementById('nextButton');
+      const captureButton = document.getElementById('captureButton');
+      const pageMini = document.getElementById('pageMini');
       const modal = document.getElementById('modal');
       const modalTitle = document.getElementById('modalTitle');
       const modalMap = document.getElementById('modalMap');
@@ -1063,57 +1196,23 @@
           track.appendChild(slide);
         });
 
-        renderPager();
         setCurrentPage(0, false);
-      }
-
-      function renderPager() {
-        pager.innerHTML = '';
-
-        pages.forEach((_, index) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'page-btn';
-          button.textContent = String(index + 1);
-          button.setAttribute('aria-label', `Go to page ${index + 1}`);
-          button.addEventListener('click', () => goToPage(index));
-          pager.appendChild(button);
-        });
-
-        const count = document.createElement('div');
-        count.id = 'pageCount';
-        count.className = 'page-count';
-        pager.appendChild(count);
       }
 
       function setCurrentPage(index, fireAnalytics = true) {
         const bounded = Math.max(0, Math.min(PAGE_COUNT - 1, index));
-        if (bounded === currentPage && document.querySelector('.page-btn.active')) {
-          updateNav();
-          return;
-        }
-
+        const changed = bounded !== currentPage;
         currentPage = bounded;
 
-        pager.querySelectorAll('.page-btn').forEach((button, idx) => {
-          button.classList.toggle('active', idx === currentPage);
-          button.setAttribute('aria-current', idx === currentPage ? 'page' : 'false');
-        });
+        if (pageMini) {
+          pageMini.textContent = `${currentPage + 1}/${PAGE_COUNT}`;
+        }
 
-        const pageCount = document.getElementById('pageCount');
-        if (pageCount) pageCount.textContent = `${currentPage + 1} / ${PAGE_COUNT}`;
-
-        updateNav();
-
-        if (fireAnalytics) {
+        if (fireAnalytics && changed) {
           trackEvent('industry_carousel_page', { page: currentPage + 1 });
         }
       }
 
-      function updateNav() {
-        prevButton.disabled = currentPage <= 0;
-        nextButton.disabled = currentPage >= PAGE_COUNT - 1;
-      }
 
       function goToPage(index) {
         const bounded = Math.max(0, Math.min(PAGE_COUNT - 1, index));
@@ -1154,7 +1253,6 @@
 
       async function loadData() {
         refreshButton.disabled = true;
-        statusPill.textContent = 'Loading market data…';
 
         try {
           const response = await fetch(DATA_URL, {
@@ -1185,7 +1283,6 @@
           renderSlides();
 
           const latestDate = rows.map(d => d.latestDate).filter(Boolean).sort().at(-1) || 'latest';
-          statusPill.innerHTML = `<strong>${rows.length.toLocaleString('en-US')}</strong> tickers · <strong>${industries.length}</strong> industries · ${latestDate}`;
 
           trackEvent('industry_treemap_loaded', {
             tickers: rows.length,
@@ -1203,18 +1300,84 @@
                 <code>${String(error.message || error)}</code>
               </div>
             </div>`;
-          statusPill.textContent = 'Data load failed';
-          pager.innerHTML = '';
-          prevButton.disabled = true;
-          nextButton.disabled = true;
           trackEvent('industry_treemap_error', { message: String(error.message || error) });
         } finally {
           refreshButton.disabled = false;
         }
       }
 
-      prevButton.addEventListener('click', () => goToPage(currentPage - 1));
-      nextButton.addEventListener('click', () => goToPage(currentPage + 1));
+      let captureTimer = 0;
+
+      function enterCaptureMode() {
+        if (captureTimer) window.clearTimeout(captureTimer);
+        document.body.classList.add('capture-mode');
+
+        trackEvent('industry_capture_mode', {
+          page: currentPage + 1
+        });
+
+        // Controls return automatically so mobile users never get stuck.
+        captureTimer = window.setTimeout(() => {
+          document.body.classList.remove('capture-mode');
+          captureTimer = 0;
+        }, 12000);
+      }
+
+      captureButton.addEventListener('click', enterCaptureMode);
+
+      // Desktop click-drag navigation, without adding visible arrows.
+      let dragging = false;
+      let dragStartX = 0;
+      let dragStartScroll = 0;
+      let dragMoved = false;
+
+      track.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'touch') return;
+        if (event.button !== 0) return;
+
+        dragging = true;
+        dragMoved = false;
+        dragStartX = event.clientX;
+        dragStartScroll = track.scrollLeft;
+        track.classList.add('is-dragging');
+        track.setPointerCapture?.(event.pointerId);
+      });
+
+      track.addEventListener('pointermove', event => {
+        if (!dragging) return;
+        const dx = event.clientX - dragStartX;
+        if (Math.abs(dx) > 4) dragMoved = true;
+        track.scrollLeft = dragStartScroll - dx;
+      });
+
+      function endDrag(event) {
+        if (!dragging) return;
+        dragging = false;
+        track.classList.remove('is-dragging');
+        try { track.releasePointerCapture?.(event.pointerId); } catch (_) {}
+
+        const next = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        goToPage(next);
+      }
+
+      track.addEventListener('pointerup', endDrag);
+      track.addEventListener('pointercancel', endDrag);
+
+      // Desktop wheel/trackpad navigation. Ctrl+wheel is left alone for browser zoom.
+      track.addEventListener('wheel', event => {
+        if (event.ctrlKey || event.metaKey) return;
+
+        const dominant = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+
+        if (Math.abs(dominant) < 1) return;
+
+        event.preventDefault();
+        track.scrollLeft += dominant;
+      }, { passive: false });
+
+
       refreshButton.addEventListener('click', loadData);
       track.addEventListener('scroll', onTrackScroll, { passive: true });
 
@@ -1224,6 +1387,14 @@
       });
 
       window.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && document.body.classList.contains('capture-mode')) {
+          document.body.classList.remove('capture-mode');
+          if (captureTimer) {
+            window.clearTimeout(captureTimer);
+            captureTimer = 0;
+          }
+          return;
+        }
         if (event.key === 'Escape' && modal.classList.contains('open')) {
           closeModal();
           return;
