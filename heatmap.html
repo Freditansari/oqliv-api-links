@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>OQLIV — Industry Drawdown Treemap</title>
+  <meta name="description" content="Interactive OQLIV industry drawdown treemap. Explore market leadership, drawdowns from all-time highs, and individual ticker trend reports." />
+  <meta name="author" content="OQLIV" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#050b0e" />
+  <link rel="canonical" href="https://oqliv.com/industry-dashboard" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="OQLIV" />
+  <meta property="og:title" content="OQLIV — Industry Drawdown Treemap" />
+  <meta property="og:description" content="See which industries and stocks are closest to their all-time highs—and which remain deep in drawdown." />
+  <meta property="og:url" content="https://oqliv.com/industry-dashboard" />
+  <meta property="og:image" content="https://oqliv.com/static/og-default.jpg" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OQLIV — Industry Drawdown Treemap" />
+  <meta name="twitter:description" content="Interactive market treemap built from OQLIV industry drawdown data." />
+  <meta name="twitter:image" content="https://oqliv.com/static/og-default.jpg" />
+  <meta name="twitter:site" content="@oqlivhq" />
+  <meta name="twitter:creator" content="@fredyyudiawan" />
+
+  <link rel="icon" href="https://oqliv.com/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://oqliv.com/apple-touch-icon.png" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VPH9J11PEH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-VPH9J11PEH');
+  </script>
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod ?
+    n.callMethod.apply(n,arguments) : n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '423687977221560');
+    fbq('track', 'PageView');
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050b0e;
+      --panel: #071115;
+      --panel-2: #09151a;
+      --border: #17242a;
+      --border-strong: #24363e;
+      --text: #f7f9fa;
+      --muted: #7f9199;
+      --orange: #ff7a00;
+      --green: #218d5d;
+      --green-2: #43a047;
+      --yellow: #d9aa29;
+      --orange-map: #f17a2b;
+      --red: #dd3f47;
+      --gap: 6px;
+      --radius: 14px;
+      --shadow: 0 22px 60px rgba(0,0,0,.34);
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% -15%, rgba(255,122,0,.10), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    button, input { font: inherit; }
+    a { color: inherit; }
+
+    .shell {
+      width: min(1880px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 34px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 13px;
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,122,0,.55);
+      border-radius: 12px;
+      background: #080d10;
+      color: var(--orange);
+      font-weight: 950;
+      letter-spacing: -.06em;
+      box-shadow: 0 12px 34px rgba(0,0,0,.26);
+    }
+
+    .title-wrap { min-width: 0; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(18px, 2vw, 27px);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill,
+    .refresh-btn {
+      min-height: 34px;
+      padding: 8px 11px;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: rgba(8,17,21,.92);
+      color: #b8c4c9;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .status-pill strong { color: var(--text); }
+
+    .refresh-btn {
+      cursor: pointer;
+      color: #ffd0a5;
+      border-color: rgba(255,122,0,.34);
+      background: rgba(255,122,0,.07);
+    }
+
+    .refresh-btn:hover { border-color: rgba(255,122,0,.72); }
+    .refresh-btn:disabled { opacity: .48; cursor: wait; }
+
+    .carousel {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #03080a;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .track {
+      display: flex;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x pan-y;
+    }
+
+    .track::-webkit-scrollbar { display: none; }
+
+    .slide {
+      flex: 0 0 100%;
+      width: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: 8px;
+      background: #03080a;
+    }
+
+    .industry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .industry-card {
+      position: relative;
+      min-width: 0;
+      aspect-ratio: 1.56 / 1;
+      overflow: hidden;
+      background: #051014;
+      border: 1px solid #101d22;
+      border-radius: 3px;
+    }
+
+    .industry-head {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 6px 0 7px;
+      background: #071115;
+      border-bottom: 2px solid #020607;
+    }
+
+    .industry-title {
+      min-width: 0;
+      flex: 1 1 auto;
+      color: #f3f5f6;
+      font-size: clamp(8px, .68vw, 11px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .expand-btn {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: #78909a;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, background .15s ease;
+    }
+
+    .industry-card:hover .expand-btn,
+    .expand-btn:focus-visible {
+      opacity: 1;
+    }
+
+    .expand-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,.07);
+    }
+
+    .industry-map {
+      display: block;
+      width: 100%;
+      height: calc(100% - 28px);
+      background: #020708;
+    }
+
+    .node-link { outline: none; }
+    .node-link:hover rect { filter: brightness(1.14); }
+    .node-link:focus-visible rect { stroke: #fff; stroke-width: 4px; }
+
+    .ticker-label {
+      fill: #fff;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+      paint-order: stroke;
+      stroke: rgba(0,0,0,.38);
+      stroke-width: 2px;
+      stroke-linejoin: round;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 900;
+    }
+
+    .nav-arrow {
+      position: absolute;
+      z-index: 8;
+      top: 50%;
+      width: 56px;
+      height: 128px;
+      transform: translateY(-50%);
+      display: grid;
+      place-items: center;
+      border: 0;
+      color: #fff;
+      font-size: 38px;
+      font-weight: 300;
+      cursor: pointer;
+      opacity: .08;
+      transition: opacity .15s ease, background .15s ease;
+    }
+
+    .nav-arrow:hover,
+    .carousel:hover .nav-arrow { opacity: .78; }
+
+    .nav-arrow.prev {
+      left: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,.88), rgba(0,0,0,0));
+    }
+
+    .nav-arrow.next {
+      right: 0;
+      background: linear-gradient(270deg, rgba(0,0,0,.88), rgba(0,0,0,0));
+    }
+
+    .nav-arrow:disabled {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    .carousel-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 4px 0;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: #071115;
+      color: #82949c;
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .page-btn.active {
+      border-color: rgba(255,122,0,.74);
+      background: rgba(255,122,0,.13);
+      color: #ffd2aa;
+    }
+
+    .page-count {
+      color: #8da0a8;
+      font-size: 10px;
+      font-weight: 800;
+      margin-left: 4px;
+      min-width: 42px;
+      text-align: right;
+    }
+
+    .loading,
+    .error-state {
+      min-height: 62vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 30px;
+      color: #98a8ae;
+      font-size: 13px;
+    }
+
+    .loading strong,
+    .error-state strong { color: #fff; }
+
+    .error-state code {
+      display: block;
+      margin-top: 10px;
+      color: #ffb5b5;
+      word-break: break-word;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.86);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-card {
+      width: min(1180px, 96vw);
+      max-height: 92vh;
+      overflow: hidden;
+      border: 1px solid #2b3d45;
+      border-radius: 14px;
+      background: #041014;
+      box-shadow: 0 28px 100px rgba(0,0,0,.65);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 50px;
+      padding: 10px 13px 10px 15px;
+      border-bottom: 1px solid #1a2a31;
+    }
+
+    .modal-title {
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #2a3a42;
+      border-radius: 8px;
+      background: #08151a;
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .modal-map {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 320px;
+      background: #020708;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: #5f727a;
+      font-size: 9px;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1100px) {
+      .industry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .industry-card { aspect-ratio: 1.45 / 1; }
+    }
+
+    @media (max-width: 780px) {
+      .shell {
+        width: min(100% - 12px, 1880px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        margin-bottom: 9px;
+      }
+
+      .logo { width: 37px; height: 37px; border-radius: 10px; }
+      .subtitle { max-width: 60vw; }
+      .status-pill { display: none; }
+
+      .carousel { border-radius: 10px; }
+      .slide { padding: 5px; }
+      .industry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+      .industry-card { aspect-ratio: 1.28 / 1; }
+      .industry-head { height: 24px; padding-left: 5px; }
+      .industry-map { height: calc(100% - 24px); }
+      .industry-title { font-size: clamp(7px, 2.35vw, 10px); }
+      .expand-btn { opacity: 1; width: 20px; height: 20px; }
+      .nav-arrow { display: none; }
+
+      .carousel-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+        padding: 9px 2px 0;
+      }
+
+      .legend { gap: 7px; font-size: 9px; }
+      .pager { width: 100%; justify-content: center; }
+      .page-btn { min-width: 25px; height: 25px; padding: 0 6px; }
+      .page-count { min-width: auto; }
+
+      .modal { padding: 8px; }
+      .modal-card { width: 100%; }
+      .modal-map { min-height: 60vh; aspect-ratio: auto; }
+    }
+
+    @media (max-width: 440px) {
+      .shell { width: calc(100% - 8px); }
+      h1 { font-size: 17px; }
+      .subtitle { max-width: 64vw; font-size: 9px; }
+      .refresh-btn { min-height: 31px; padding: 6px 9px; font-size: 9px; }
+      .industry-card { aspect-ratio: 1.18 / 1; }
+      .industry-head { height: 23px; }
+      .industry-map { height: calc(100% - 23px); }
+      .industry-title { font-size: 7.5px; }
+      .legend-item:nth-child(4) { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .track { scroll-behavior: auto; }
+      * { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <img height="1" width="1" style="display:none" alt=""
+         src="https://www.facebook.com/tr?id=423687977221560&ev=PageView&noscript=1" />
+  </noscript>
+
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">OQ</div>
+        <div class="title-wrap">
+          <h1>Industry Drawdown Map</h1>
+          <div class="subtitle">Market-cap weighted industry treemaps · rectangle size = plot size · color = drawdown from ATH</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div id="statusPill" class="status-pill">Loading market data…</div>
+        <button id="refreshButton" class="refresh-btn" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <section class="carousel" aria-label="Industry drawdown carousel">
+      <button id="prevButton" class="nav-arrow prev" type="button" aria-label="Previous page">‹</button>
+      <div id="track" class="track">
+        <div class="loading"><div><strong>Building treemaps…</strong><br>Downloading the latest OQLIV drawdown data.</div></div>
+      </div>
+      <button id="nextButton" class="nav-arrow next" type="button" aria-label="Next page">›</button>
+    </section>
+
+    <div class="carousel-footer">
+      <div class="legend" aria-label="Drawdown color legend">
+        <span class="legend-item"><i class="swatch" style="background:#218d5d"></i> 0 to −10%</span>
+        <span class="legend-item"><i class="swatch" style="background:#d9aa29"></i> −10 to −20%</span>
+        <span class="legend-item"><i class="swatch" style="background:#f17a2b"></i> −20 to −35%</span>
+        <span class="legend-item"><i class="swatch" style="background:#dd3f47"></i> below −35%</span>
+      </div>
+
+      <div id="pager" class="pager" aria-label="Carousel pages"></div>
+    </div>
+
+    <div class="footer-note">
+      Industry headline drawdown is weighted by <strong>plot_size</strong>. Ticker rectangle area is proportional to <strong>plot_size</strong>. Tap a ticker to open its OQLIV Trend Report.
+    </div>
+  </main>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div id="modalTitle" class="modal-title">Industry</div>
+        <button id="modalClose" class="modal-close" type="button" aria-label="Close">×</button>
+      </div>
+      <svg id="modalMap" class="modal-map" viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const DATA_URL = 'https://oqliv.com/download/ticker_ath_drawdown.csv';
+      const PAGE_COUNT = 9;
+      const INDUSTRIES_PER_PAGE = 16;
+      const MAX_INDUSTRIES = PAGE_COUNT * INDUSTRIES_PER_PAGE;
+
+      const track = document.getElementById('track');
+      const pager = document.getElementById('pager');
+      const statusPill = document.getElementById('statusPill');
+      const refreshButton = document.getElementById('refreshButton');
+      const prevButton = document.getElementById('prevButton');
+      const nextButton = document.getElementById('nextButton');
+      const modal = document.getElementById('modal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalMap = document.getElementById('modalMap');
+      const modalClose = document.getElementById('modalClose');
+
+      let currentPage = 0;
+      let pages = [];
+      let industryLookup = new Map();
+      let scrollRaf = 0;
+
+      function trackEvent(name, params = {}) {
+        try {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', name, params);
+          }
+          if (typeof window.fbq === 'function') {
+            window.fbq('trackCustom', name, params);
+          }
+        } catch (_) {}
+      }
+
+      function num(value, fallback = NaN) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+      }
+
+      function fmtPct(value, digits = 1) {
+        const n = num(value);
+        if (!Number.isFinite(n)) return '—';
+        const rounded = n.toFixed(digits);
+        return `${rounded}%`;
+      }
+
+      function fmtMoney(value) {
+        const n = num(value);
+        if (!Number.isFinite(n)) return '—';
+        if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+        if (Math.abs(n) >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
+        if (Math.abs(n) >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
+        return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+      }
+
+      function colorForDrawdown(value) {
+        const d = num(value, -100);
+        if (d >= -10) return '#218d5d';
+        if (d >= -20) return '#d9aa29';
+        if (d >= -35) return '#f17a2b';
+        return '#dd3f47';
+      }
+
+      function safeTicker(value) {
+        return String(value || '')
+          .trim()
+          .toUpperCase()
+          .replace(/[^A-Z0-9.\-^=]/g, '');
+      }
+
+      function getNodeSize(row) {
+        const candidates = [row.plot_size, row.market_cap, row.total_assets, row.raw_size];
+        for (const candidate of candidates) {
+          const n = num(candidate);
+          if (Number.isFinite(n) && n > 0) return n;
+        }
+        return 1;
+      }
+
+      function normalizeRows(rawRows) {
+        return rawRows
+          .map(row => ({
+            ticker: safeTicker(row.ticker),
+            name: String(row.name || '').trim(),
+            sector: String(row.sector || 'Unknown').trim() || 'Unknown',
+            industry: String(row.industry || 'Unknown').trim() || 'Unknown',
+            drawdown: num(row.drawdown_from_ath_pct),
+            return6m: num(row.return_6m_pct),
+            latestPrice: num(row.latest_price),
+            athPrice: num(row.ath_price),
+            latestDate: String(row.latest_date || '').trim(),
+            size: getNodeSize(row)
+          }))
+          .filter(row => row.ticker && row.industry !== 'Unknown' && Number.isFinite(row.drawdown) && row.size > 0);
+      }
+
+      function aggregateIndustries(rows) {
+        const grouped = d3.group(rows, d => d.industry);
+        const industries = [];
+
+        for (const [industry, members] of grouped) {
+          const totalSize = d3.sum(members, d => d.size);
+          if (!(totalSize > 0)) continue;
+
+          const weightedDrawdown = d3.sum(members, d => d.drawdown * d.size) / totalSize;
+          const sectorCounts = d3.rollups(members, v => v.length, d => d.sector)
+            .sort((a, b) => d3.descending(a[1], b[1]));
+
+          members.sort((a, b) => d3.descending(a.size, b.size));
+
+          industries.push({
+            industry,
+            sector: sectorCounts[0]?.[0] || 'Unknown',
+            members,
+            count: members.length,
+            totalSize,
+            weightedDrawdown
+          });
+        }
+
+        industries.sort((a, b) => d3.descending(a.totalSize, b.totalSize));
+        return industries.slice(0, MAX_INDUSTRIES);
+      }
+
+      function buildPages(industries) {
+        const result = [];
+        for (let i = 0; i < PAGE_COUNT; i++) {
+          const start = i * INDUSTRIES_PER_PAGE;
+          result.push(industries.slice(start, start + INDUSTRIES_PER_PAGE));
+        }
+        return result;
+      }
+
+      function drawIndustryTreemap(svgNode, industry, options = {}) {
+        const width = options.width || 1000;
+        const height = options.height || 620;
+        const modalMode = Boolean(options.modalMode);
+        const svg = d3.select(svgNode);
+
+        svg.selectAll('*').remove();
+        svg.attr('viewBox', `0 0 ${width} ${height}`)
+          .attr('preserveAspectRatio', 'none');
+
+        const hierarchy = d3.hierarchy({ children: industry.members })
+          .sum(d => d.size || 0)
+          .sort((a, b) => (b.value || 0) - (a.value || 0));
+
+        d3.treemap()
+          .tile(d3.treemapSquarify.ratio(1.25))
+          .size([width, height])
+          .paddingInner(modalMode ? 4 : 5)
+          .round(true)(hierarchy);
+
+        const leaves = hierarchy.leaves();
+
+        const links = svg.selectAll('a.node-link')
+          .data(leaves)
+          .enter()
+          .append('a')
+          .attr('class', 'node-link')
+          .attr('href', d => `https://oqliv.com/trend-report?ticker=${encodeURIComponent(d.data.ticker)}`)
+          .attr('target', '_self')
+          .attr('aria-label', d => `${d.data.ticker}, drawdown ${fmtPct(d.data.drawdown)}`)
+          .on('click', (_, d) => {
+            trackEvent('trend_report_click', {
+              ticker: d.data.ticker,
+              industry: industry.industry,
+              drawdown: Number(d.data.drawdown.toFixed(2))
+            });
+          });
+
+        links.append('rect')
+          .attr('x', d => d.x0)
+          .attr('y', d => d.y0)
+          .attr('width', d => Math.max(0, d.x1 - d.x0))
+          .attr('height', d => Math.max(0, d.y1 - d.y0))
+          .attr('rx', modalMode ? 2 : 0)
+          .attr('fill', d => colorForDrawdown(d.data.drawdown))
+          .attr('stroke', '#020708')
+          .attr('stroke-width', modalMode ? 2 : 1.5);
+
+        links.append('title')
+          .text(d => {
+            const parts = [
+              `${d.data.ticker} — ${d.data.name || industry.industry}`,
+              `Drawdown from ATH: ${fmtPct(d.data.drawdown)}`,
+              `Plot size: ${fmtMoney(d.data.size)}`
+            ];
+            if (Number.isFinite(d.data.latestPrice)) parts.push(`Latest: $${d.data.latestPrice.toFixed(2)}`);
+            return parts.join('\n');
+          });
+
+        links.each(function(d) {
+          const group = d3.select(this);
+          const w = d.x1 - d.x0;
+          const h = d.y1 - d.y0;
+          const area = w * h;
+          const cx = d.x0 + w / 2;
+          const cy = d.y0 + h / 2;
+
+          const minTickerArea = modalMode ? 1800 : 3100;
+          const minTwoLineArea = modalMode ? 5200 : 9500;
+          const minW = modalMode ? 35 : 42;
+          const minH = modalMode ? 24 : 30;
+
+          if (area < minTickerArea || w < minW || h < minH) return;
+
+          const base = Math.max(8, Math.min(modalMode ? 24 : 19, Math.sqrt(area) / (modalMode ? 6.4 : 7.5)));
+          const fontSize = Math.min(base, w / Math.max(3.4, d.data.ticker.length * .65));
+
+          const text = group.append('text')
+            .attr('class', 'ticker-label')
+            .attr('x', cx)
+            .attr('y', cy)
+            .style('font-size', `${fontSize}px`);
+
+          if (area >= minTwoLineArea && h >= 42) {
+            text.attr('y', cy - fontSize * .38);
+            text.append('tspan')
+              .attr('x', cx)
+              .text(d.data.ticker);
+            text.append('tspan')
+              .attr('x', cx)
+              .attr('dy', `${fontSize * 1.05}px`)
+              .style('font-size', `${Math.max(7, fontSize * .78)}px`)
+              .text(fmtPct(d.data.drawdown));
+          } else {
+            text.text(d.data.ticker);
+          }
+        });
+      }
+
+      function makeIndustryCard(industry, pageIndex, cardIndex) {
+        const article = document.createElement('article');
+        article.className = 'industry-card';
+        article.dataset.industry = industry.industry;
+
+        const head = document.createElement('div');
+        head.className = 'industry-head';
+
+        const title = document.createElement('div');
+        title.className = 'industry-title';
+        title.title = industry.industry;
+        title.textContent = `${industry.industry}  |  ${fmtPct(industry.weightedDrawdown)}  |  ${industry.count}`;
+
+        const expand = document.createElement('button');
+        expand.className = 'expand-btn';
+        expand.type = 'button';
+        expand.title = `Expand ${industry.industry}`;
+        expand.setAttribute('aria-label', `Expand ${industry.industry}`);
+        expand.textContent = '⤢';
+        expand.addEventListener('click', () => openIndustryModal(industry));
+
+        head.append(title, expand);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add('industry-map');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', `${industry.industry} drawdown treemap`);
+
+        article.append(head, svg);
+
+        requestAnimationFrame(() => {
+          drawIndustryTreemap(svg, industry, { width: 1000, height: 620 });
+        });
+
+        return article;
+      }
+
+      function renderSlides() {
+        track.innerHTML = '';
+        industryLookup = new Map();
+
+        pages.forEach((pageIndustries, pageIndex) => {
+          const slide = document.createElement('section');
+          slide.className = 'slide';
+          slide.dataset.page = String(pageIndex);
+          slide.setAttribute('aria-label', `Industry dashboard page ${pageIndex + 1} of ${PAGE_COUNT}`);
+
+          const grid = document.createElement('div');
+          grid.className = 'industry-grid';
+
+          pageIndustries.forEach((industry, cardIndex) => {
+            industryLookup.set(industry.industry, industry);
+            grid.appendChild(makeIndustryCard(industry, pageIndex, cardIndex));
+          });
+
+          slide.appendChild(grid);
+          track.appendChild(slide);
+        });
+
+        renderPager();
+        setCurrentPage(0, false);
+      }
+
+      function renderPager() {
+        pager.innerHTML = '';
+
+        pages.forEach((_, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'page-btn';
+          button.textContent = String(index + 1);
+          button.setAttribute('aria-label', `Go to page ${index + 1}`);
+          button.addEventListener('click', () => goToPage(index));
+          pager.appendChild(button);
+        });
+
+        const count = document.createElement('div');
+        count.id = 'pageCount';
+        count.className = 'page-count';
+        pager.appendChild(count);
+      }
+
+      function setCurrentPage(index, fireAnalytics = true) {
+        const bounded = Math.max(0, Math.min(PAGE_COUNT - 1, index));
+        if (bounded === currentPage && document.querySelector('.page-btn.active')) {
+          updateNav();
+          return;
+        }
+
+        currentPage = bounded;
+
+        pager.querySelectorAll('.page-btn').forEach((button, idx) => {
+          button.classList.toggle('active', idx === currentPage);
+          button.setAttribute('aria-current', idx === currentPage ? 'page' : 'false');
+        });
+
+        const pageCount = document.getElementById('pageCount');
+        if (pageCount) pageCount.textContent = `${currentPage + 1} / ${PAGE_COUNT}`;
+
+        updateNav();
+
+        if (fireAnalytics) {
+          trackEvent('industry_carousel_page', { page: currentPage + 1 });
+        }
+      }
+
+      function updateNav() {
+        prevButton.disabled = currentPage <= 0;
+        nextButton.disabled = currentPage >= PAGE_COUNT - 1;
+      }
+
+      function goToPage(index) {
+        const bounded = Math.max(0, Math.min(PAGE_COUNT - 1, index));
+        const slide = track.querySelector(`.slide[data-page="${bounded}"]`);
+        if (!slide) return;
+
+        track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+        setCurrentPage(bounded);
+      }
+
+      function onTrackScroll() {
+        if (scrollRaf) return;
+        scrollRaf = requestAnimationFrame(() => {
+          scrollRaf = 0;
+          if (!track.clientWidth) return;
+          const next = Math.round(track.scrollLeft / track.clientWidth);
+          setCurrentPage(next);
+        });
+      }
+
+      function openIndustryModal(industry) {
+        modalTitle.textContent = `${industry.industry}  |  ${fmtPct(industry.weightedDrawdown)}  |  ${industry.count} tickers`;
+        drawIndustryTreemap(modalMap, industry, { width: 1200, height: 675, modalMode: true });
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        modalClose.focus({ preventScroll: true });
+        trackEvent('industry_treemap_expand', { industry: industry.industry });
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      async function loadData() {
+        refreshButton.disabled = true;
+        statusPill.textContent = 'Loading market data…';
+
+        try {
+          const response = await fetch(DATA_URL, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: { Accept: 'text/csv,text/plain;q=0.9,*/*;q=0.8' }
+          });
+
+          if (!response.ok) {
+            throw new Error(`CSV request failed: HTTP ${response.status}`);
+          }
+
+          const csvText = await response.text();
+          const rawRows = d3.csvParse(csvText);
+          const rows = normalizeRows(rawRows);
+
+          if (!rows.length) {
+            throw new Error('CSV loaded but no usable ticker rows were found.');
+          }
+
+          const industries = aggregateIndustries(rows);
+          pages = buildPages(industries);
+
+          if (!pages[0]?.length) {
+            throw new Error('No industry groups could be built from the CSV.');
+          }
+
+          renderSlides();
+
+          const latestDate = rows.map(d => d.latestDate).filter(Boolean).sort().at(-1) || 'latest';
+          statusPill.innerHTML = `<strong>${rows.length.toLocaleString('en-US')}</strong> tickers · <strong>${industries.length}</strong> industries · ${latestDate}`;
+
+          trackEvent('industry_treemap_loaded', {
+            tickers: rows.length,
+            industries: industries.length,
+            pages: PAGE_COUNT,
+            latest_date: latestDate
+          });
+        } catch (error) {
+          console.error(error);
+          track.innerHTML = `
+            <div class="error-state">
+              <div>
+                <strong>Unable to load the OQLIV CSV.</strong><br>
+                This page expects the browser to fetch the data directly from OQLIV.
+                <code>${String(error.message || error)}</code>
+              </div>
+            </div>`;
+          statusPill.textContent = 'Data load failed';
+          pager.innerHTML = '';
+          prevButton.disabled = true;
+          nextButton.disabled = true;
+          trackEvent('industry_treemap_error', { message: String(error.message || error) });
+        } finally {
+          refreshButton.disabled = false;
+        }
+      }
+
+      prevButton.addEventListener('click', () => goToPage(currentPage - 1));
+      nextButton.addEventListener('click', () => goToPage(currentPage + 1));
+      refreshButton.addEventListener('click', loadData);
+      track.addEventListener('scroll', onTrackScroll, { passive: true });
+
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', event => {
+        if (event.target === modal) closeModal();
+      });
+
+      window.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal.classList.contains('open')) {
+          closeModal();
+          return;
+        }
+        if (modal.classList.contains('open')) return;
+        if (event.key === 'ArrowLeft') goToPage(currentPage - 1);
+        if (event.key === 'ArrowRight') goToPage(currentPage + 1);
+      });
+
+      window.addEventListener('resize', () => {
+        const slide = track.querySelector(`.slide[data-page="${currentPage}"]`);
+        if (slide) track.scrollLeft = slide.offsetLeft;
+      });
+
+      loadData();
+    })();
+  </script>
+</body>
+</html>
