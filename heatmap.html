@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes, maximum-scale=8" />
 
   <title>OQLIV — Industry Drawdown Treemap</title>
   <meta name="description" content="Interactive OQLIV industry drawdown treemap. Explore market leadership, drawdowns from all-time highs, and individual ticker trend reports." />
@@ -552,6 +552,151 @@
       .track { scroll-behavior: auto; }
       * { transition-duration: 0.01ms !important; }
     }
+  
+    /* Full-screen / mobile / pinch-zoom overrides */
+    html, body { width:100%; min-height:100%; }
+    body { min-height:100dvh; overflow-x:hidden; }
+
+    .shell {
+      width:100%;
+      min-height:100dvh;
+      margin:0;
+      padding:max(3px, env(safe-area-inset-top))
+              max(3px, env(safe-area-inset-right))
+              max(3px, env(safe-area-inset-bottom))
+              max(3px, env(safe-area-inset-left));
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar {
+      flex:0 0 auto;
+      min-height:30px;
+      margin:0 0 3px;
+      gap:7px;
+    }
+    .brand { gap:6px; }
+    .logo {
+      width:24px; height:24px; border-radius:6px;
+      font-size:9px; box-shadow:none;
+    }
+    h1 { font-size:11px; line-height:1; letter-spacing:-.02em; }
+    .subtitle { display:none; }
+
+    .top-actions { gap:4px; flex-wrap:nowrap; }
+    .status-pill {
+      max-width:40vw; min-height:24px; padding:4px 7px;
+      font-size:7.5px; white-space:nowrap; overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .refresh-btn {
+      min-height:24px; padding:4px 7px; font-size:7.5px;
+    }
+
+    .carousel {
+      flex:1 1 auto;
+      min-height:0;
+      border-radius:2px;
+      box-shadow:none;
+      overflow:hidden;
+    }
+
+    .track {
+      height:100%;
+      min-height:0;
+      touch-action:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x mandatory;
+    }
+
+    .slide {
+      height:100%;
+      min-height:0;
+      padding:2px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    .industry-grid {
+      min-height:100%;
+      gap:2px;
+      align-content:start;
+    }
+
+    .industry-card { border-radius:1px; }
+    .industry-head { height:21px; padding:0 3px 0 4px; }
+    .industry-map { height:calc(100% - 21px); }
+    .industry-title { font-size:clamp(7px, .65vw, 10px); }
+    .expand-btn { opacity:.8; width:18px; height:18px; font-size:10px; }
+
+    .carousel-footer {
+      position:fixed;
+      z-index:20;
+      left:50%;
+      bottom:max(4px, env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      width:auto;
+      max-width:calc(100vw - 10px);
+      margin:0;
+      padding:3px 5px;
+      border:1px solid rgba(36,54,62,.74);
+      border-radius:999px;
+      background:rgba(3,8,10,.76);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      gap:7px;
+      align-items:center;
+      flex-direction:row;
+    }
+
+    .legend { gap:5px; font-size:7.5px; flex-wrap:nowrap; }
+    .swatch { width:7px; height:7px; }
+    .pager { width:auto; gap:3px; flex-wrap:nowrap; }
+    .page-btn { min-width:20px; height:20px; padding:0 5px; font-size:8px; }
+    .page-count { min-width:28px; margin-left:2px; font-size:8px; }
+    .footer-note { display:none; }
+
+    .modal { padding:0; background:rgba(0,0,0,.96); }
+    .modal-card {
+      width:100vw; height:100dvh; max-height:none;
+      border:0; border-radius:0;
+      display:flex; flex-direction:column;
+    }
+    .modal-head {
+      flex:0 0 36px; min-height:36px;
+      padding:max(4px, env(safe-area-inset-top))
+              max(7px, env(safe-area-inset-right))
+              4px
+              max(7px, env(safe-area-inset-left));
+    }
+    .modal-title { font-size:10px; }
+    .modal-close { width:26px; height:26px; border-radius:5px; font-size:15px; }
+    .modal-map {
+      flex:1 1 auto; width:100%; height:auto; min-height:0;
+      aspect-ratio:auto; touch-action:auto;
+    }
+
+    @media (max-width:1100px) {
+      .industry-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .industry-card { aspect-ratio:1.22/1; }
+    }
+
+    @media (max-width:780px) {
+      .status-pill { display:none; }
+      .industry-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px; }
+      .industry-card { aspect-ratio:1.08/1; }
+      .legend { display:none; }
+      .nav-arrow { display:none; }
+    }
+
+    @media (max-width:440px) {
+      .industry-card { aspect-ratio:1/1; }
+      .industry-head { height:20px; }
+      .industry-map { height:calc(100% - 20px); }
+      .industry-title { font-size:7px; }
+    }
+
   </style>
 </head>
 <body>
@@ -565,14 +710,14 @@
       <div class="brand">
         <div class="logo">OQ</div>
         <div class="title-wrap">
-          <h1>Industry Drawdown Map</h1>
+          <h1>Industry Map</h1>
           <div class="subtitle">Market-cap weighted industry treemaps · rectangle size = plot size · color = drawdown from ATH</div>
         </div>
       </div>
 
       <div class="top-actions">
         <div id="statusPill" class="status-pill">Loading market data…</div>
-        <button id="refreshButton" class="refresh-btn" type="button">Refresh</button>
+        <button id="refreshButton" class="refresh-btn" type="button">↻ Refresh</button>
       </div>
     </header>
 
@@ -804,39 +949,54 @@
             return parts.join('\n');
           });
 
-        links.each(function(d) {
+        /* Every treemap box gets SVG text. Tiny labels become readable when pinch-zoomed. */
+        const defs = svg.append('defs');
+
+        links.each(function(d, i) {
           const group = d3.select(this);
-          const w = d.x1 - d.x0;
-          const h = d.y1 - d.y0;
+          const w = Math.max(0, d.x1 - d.x0);
+          const h = Math.max(0, d.y1 - d.y0);
           const area = w * h;
           const cx = d.x0 + w / 2;
           const cy = d.y0 + h / 2;
 
-          const minTickerArea = modalMode ? 1800 : 3100;
-          const minTwoLineArea = modalMode ? 5200 : 9500;
-          const minW = modalMode ? 35 : 42;
-          const minH = modalMode ? 24 : 30;
+          const clipId = `tm-${modalMode ? 'm' : 'c'}-${i}-${Math.random().toString(36).slice(2,7)}`;
+          defs.append('clipPath')
+            .attr('id', clipId)
+            .append('rect')
+            .attr('x', d.x0 + .5)
+            .attr('y', d.y0 + .5)
+            .attr('width', Math.max(0, w - 1))
+            .attr('height', Math.max(0, h - 1));
 
-          if (area < minTickerArea || w < minW || h < minH) return;
+          const widthFit = w / Math.max(1.45, d.data.ticker.length * .61);
+          const heightFit = h * .52;
+          const areaFit = Math.sqrt(Math.max(1, area)) / (modalMode ? 5.1 : 6.0);
 
-          const base = Math.max(8, Math.min(modalMode ? 24 : 19, Math.sqrt(area) / (modalMode ? 6.4 : 7.5)));
-          const fontSize = Math.min(base, w / Math.max(3.4, d.data.ticker.length * .65));
+          const fontSize = Math.max(
+            modalMode ? 3.0 : 2.2,
+            Math.min(modalMode ? 25 : 20, widthFit, heightFit, areaFit)
+          );
 
           const text = group.append('text')
             .attr('class', 'ticker-label')
+            .attr('clip-path', `url(#${clipId})`)
             .attr('x', cx)
             .attr('y', cy)
             .style('font-size', `${fontSize}px`);
 
-          if (area >= minTwoLineArea && h >= 42) {
-            text.attr('y', cy - fontSize * .38);
+          const showDrawdown =
+            w >= fontSize * Math.max(3.2, d.data.ticker.length * .68) &&
+            h >= fontSize * 2.15 &&
+            area >= (modalMode ? 1100 : 1900);
+
+          if (showDrawdown) {
+            text.attr('y', cy - fontSize * .36);
+            text.append('tspan').attr('x', cx).text(d.data.ticker);
             text.append('tspan')
               .attr('x', cx)
-              .text(d.data.ticker);
-            text.append('tspan')
-              .attr('x', cx)
-              .attr('dy', `${fontSize * 1.05}px`)
-              .style('font-size', `${Math.max(7, fontSize * .78)}px`)
+              .attr('dy', `${fontSize}px`)
+              .style('font-size', `${Math.max(modalMode ? 2.8 : 2.0, fontSize * .76)}px`)
               .text(fmtPct(d.data.drawdown));
           } else {
             text.text(d.data.ticker);
@@ -976,16 +1136,20 @@
 
       function openIndustryModal(industry) {
         modalTitle.textContent = `${industry.industry}  |  ${fmtPct(industry.weightedDrawdown)}  |  ${industry.count} tickers`;
-        drawIndustryTreemap(modalMap, industry, { width: 1200, height: 675, modalMode: true });
+        const modalWidth = Math.max(1200, window.innerWidth * 2);
+        const modalHeight = Math.max(1200, window.innerHeight * 2);
+        drawIndustryTreemap(modalMap, industry, {
+          width: modalWidth,
+          height: modalHeight,
+          modalMode: true
+        });
         modal.classList.add('open');
-        document.body.style.overflow = 'hidden';
         modalClose.focus({ preventScroll: true });
         trackEvent('industry_treemap_expand', { industry: industry.industry });
       }
 
       function closeModal() {
         modal.classList.remove('open');
-        document.body.style.overflow = '';
       }
 
       async function loadData() {
