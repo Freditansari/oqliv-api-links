@@ -131,11 +131,11 @@
   <style>
     :root {
       --bg: #050505;
-      --panel: #0b0b0b;
-      --panel-2: #080808;
-      --border: #242424;
+      --panel: #111111;
+      --panel-2: #0a0a0a;
+      --border: #292929;
       --text: #f5f5f5;
-      --muted: #8b8b8b;
+      --muted: #969696;
       --orange: #ff7a00;
       --orange-2: #ff922b;
       --green: #25c783;
@@ -144,7 +144,7 @@
       --blue: #5aa7ff;
       --grid: #353535;
       --axis: #858585;
-      --topbar-height: 64px;
+      --shadow: rgba(0, 0, 0, 0.35);
     }
 
     * {
@@ -153,13 +153,14 @@
 
     html {
       color-scheme: dark;
-      background: var(--bg);
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top center, rgba(255, 122, 0, 0.12), transparent 32%),
+        var(--bg);
       color: var(--text);
       font-family:
         Inter,
@@ -180,134 +181,118 @@
     }
 
     .container {
-      width: 100%;
-      margin: 0;
-      padding: 0;
+      width: min(1500px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
     }
 
     .header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
       display: flex;
       align-items: center;
-      gap: 14px;
-      min-height: var(--topbar-height);
-      padding: 8px 12px;
-      border-bottom: 1px solid #1e1e1e;
-      background: rgba(5, 5, 5, 0.93);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 9px;
-      flex: 0 0 auto;
-      min-width: max-content;
+      gap: 14px;
     }
 
     .logo {
-      width: 30px;
-      height: 30px;
+      width: 52px;
+      height: 52px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255, 122, 0, 0.42);
-      border-radius: 8px;
+      border: 1px solid rgba(255, 122, 0, 0.55);
+      border-radius: 15px;
       background: #090909;
       color: var(--orange);
-      font-size: 11px;
+      font-size: 19px;
       font-weight: 900;
-      letter-spacing: -0.4px;
+      letter-spacing: -1px;
+      box-shadow: 0 12px 34px var(--shadow);
     }
 
     h1 {
       margin: 0;
-      font-size: 14px;
-      letter-spacing: -0.2px;
+      font-size: clamp(22px, 3vw, 32px);
+      letter-spacing: -0.7px;
       line-height: 1.05;
-      font-weight: 800;
     }
 
     .subtitle {
-      margin-top: 3px;
-      color: #747474;
-      font-size: 9px;
-      line-height: 1;
-      white-space: nowrap;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .method-pill {
+      flex-shrink: 0;
+      padding: 8px 11px;
+      border: 1px solid rgba(255, 122, 0, 0.38);
+      border-radius: 999px;
+      color: var(--orange);
+      background: rgba(255, 122, 0, 0.08);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
     }
 
     .panel {
-      background: var(--panel);
+      background: rgba(17, 17, 17, 0.96);
       border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
     }
 
     .controls {
-      flex: 1 1 auto;
-      min-width: 0;
-      padding: 0;
-      margin: 0;
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-    }
-
-    #controlForm {
-      position: relative;
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
     .control-grid {
       display: grid;
       grid-template-columns:
-        minmax(88px, 0.6fr)
-        minmax(220px, 2.2fr)
-        minmax(82px, 0.65fr)
-        minmax(74px, 0.55fr)
-        minmax(74px, 0.55fr)
-        minmax(68px, 0.5fr)
-        104px;
-      gap: 7px;
+        minmax(120px, 0.8fr)
+        minmax(300px, 2.3fr)
+        minmax(100px, 0.65fr)
+        minmax(100px, 0.65fr)
+        minmax(100px, 0.65fr)
+        minmax(90px, 0.55fr)
+        135px;
+      gap: 10px;
       align-items: end;
-    }
-
-    .field {
-      min-width: 0;
     }
 
     .field label {
       display: block;
-      margin: 0 0 3px 1px;
-      color: #767676;
-      font-size: 8px;
-      font-weight: 800;
-      letter-spacing: 0.45px;
+      margin-bottom: 7px;
+      color: #c8c8c8;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.65px;
       text-transform: uppercase;
-      white-space: nowrap;
     }
 
     input,
     select {
       width: 100%;
-      height: 32px;
-      padding: 0 9px;
-      border: 1px solid #282828;
-      border-radius: 7px;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #333;
+      border-radius: 11px;
       outline: 0;
-      background: #090909;
-      color: #dcdcdc;
-      font-size: 11px;
-    }
-
-    input:hover,
-    select:hover {
-      border-color: #383838;
+      background: #080808;
+      color: var(--text);
     }
 
     input:focus,
     select:focus {
-      border-color: rgba(255, 122, 0, 0.72);
-      box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.08);
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
     }
 
     #benchmark,
@@ -316,40 +301,31 @@
     }
 
     .load-button {
-      height: 32px;
-      border: 1px solid rgba(255, 122, 0, 0.68);
-      border-radius: 7px;
-      background: rgba(255, 122, 0, 0.13);
-      color: #ffad63;
-      font-size: 10px;
-      font-weight: 850;
+      height: 44px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--orange);
+      color: #090909;
+      font-weight: 900;
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, color .15s ease;
     }
 
     .load-button:hover:not(:disabled) {
-      border-color: var(--orange);
-      background: rgba(255, 122, 0, 0.22);
-      color: #ffd1a6;
+      background: var(--orange-2);
     }
 
     .load-button:disabled {
       cursor: wait;
-      opacity: 0.5;
+      opacity: 0.58;
     }
 
     .status {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      z-index: 30;
       display: none;
-      max-width: min(460px, 88vw);
-      padding: 8px 10px;
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      font-size: 11px;
-      line-height: 1.4;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .status.visible {
@@ -358,100 +334,101 @@
 
     .status.loading {
       color: #ffd0a1;
-      background: rgba(19, 13, 8, 0.97);
+      background: rgba(255, 122, 0, 0.08);
       border: 1px solid rgba(255, 122, 0, 0.3);
     }
 
     .status.error {
       color: #ffc0c0;
-      background: rgba(20, 8, 8, 0.97);
+      background: rgba(255, 96, 96, 0.08);
       border: 1px solid rgba(255, 96, 96, 0.28);
     }
 
     .status.success {
       color: #a6ecd0;
-      background: rgba(7, 18, 13, 0.97);
+      background: rgba(37, 199, 131, 0.07);
       border: 1px solid rgba(37, 199, 131, 0.28);
     }
 
-    .chart-panel {
-      display: flex;
-      flex-direction: column;
-      height: calc(100dvh - var(--topbar-height));
-      min-height: 560px;
-      padding: 8px 10px 10px;
-      margin: 0;
-      border: 0;
-      border-radius: 0;
-      background: var(--bg);
-      box-shadow: none;
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .chart-topline {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 34px;
-      margin: 0 2px 7px;
+    .summary-card {
+      padding: 13px 14px;
+      min-height: 82px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .summary-value {
+      margin-top: 7px;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-value.leading { color: var(--green); }
+    .summary-value.weakening { color: var(--yellow); }
+    .summary-value.lagging { color: var(--red); }
+    .summary-value.improving { color: var(--blue); }
+
+    .chart-panel {
+      padding: 14px;
+      margin-bottom: 16px;
     }
 
     .chart-header {
       display: flex;
-      align-items: baseline;
-      gap: 10px;
-      min-width: 0;
-      margin: 0;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin: 2px 3px 10px;
     }
 
     .chart-title {
-      flex: 0 0 auto;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 850;
-      letter-spacing: .1px;
     }
 
     .chart-note {
-      overflow: hidden;
-      color: #6f6f6f;
-      font-size: 9px;
-      line-height: 1.2;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+      line-height: 1.45;
     }
 
     .ticker-visibility {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      gap: 7px;
-      min-width: 0;
-      margin: 0;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 3px 12px;
     }
 
     .ticker-toggle-list {
       display: flex;
-      flex-wrap: nowrap;
-      gap: 5px;
+      flex-wrap: wrap;
+      gap: 7px;
       min-width: 0;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .ticker-toggle-list::-webkit-scrollbar {
-      display: none;
     }
 
     .ticker-toggle,
     .ticker-toggle-action {
-      flex: 0 0 auto;
-      min-height: 26px;
-      padding: 4px 8px;
-      border: 1px solid #2b2b2b;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid #343434;
       border-radius: 999px;
-      background: #090909;
-      color: #666;
-      font-size: 9px;
+      background: #0a0a0a;
+      color: #777;
+      font-size: 11px;
       font-weight: 850;
       cursor: pointer;
       transition: border-color .15s ease, color .15s ease, background .15s ease, opacity .15s ease;
@@ -459,40 +436,35 @@
 
     .ticker-toggle:hover,
     .ticker-toggle-action:hover {
-      border-color: #494949;
-      color: #d0d0d0;
+      border-color: #555;
+      color: #d8d8d8;
     }
 
     .ticker-toggle.active {
-      border-color: rgba(255, 122, 0, 0.48);
-      background: rgba(255, 122, 0, 0.08);
-      color: #ffc58e;
+      border-color: rgba(255, 122, 0, 0.62);
+      background: rgba(255, 122, 0, 0.11);
+      color: #ffd0a1;
     }
 
     .ticker-toggle-actions {
       display: flex;
-      flex: 0 0 auto;
-      gap: 5px;
+      flex-shrink: 0;
+      gap: 7px;
     }
 
     .ticker-toggle-action {
-      color: #8d8d8d;
-    }
-
-    .ticker-toggle-action:disabled {
-      opacity: .35;
-      cursor: default;
+      color: #b8b8b8;
     }
 
     .chart-wrap {
       position: relative;
-      flex: 1 1 auto;
       width: 100%;
-      min-height: 0;
+      aspect-ratio: 16 / 8.2;
+      min-height: 480px;
       overflow: hidden;
-      border: 1px solid #1e1e1e;
-      border-radius: 8px;
-      background: #070707;
+      border: 1px solid #222;
+      border-radius: 15px;
+      background: #080808;
     }
 
     #rrgChart {
@@ -511,7 +483,7 @@
       padding: 10px 11px;
       pointer-events: none;
       border: 1px solid #3d3d3d;
-      border-radius: 9px;
+      border-radius: 10px;
       background: rgba(8, 8, 8, 0.96);
       box-shadow: 0 12px 30px rgba(0,0,0,.38);
       color: var(--text);
@@ -525,9 +497,7 @@
     }
 
     .table-panel {
-      margin: 14px 10px 0;
       overflow: hidden;
-      border-radius: 10px;
     }
 
     .table-head {
@@ -535,18 +505,18 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      padding: 12px 14px;
+      padding: 15px 16px;
       border-bottom: 1px solid var(--border);
     }
 
     .table-title {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 850;
     }
 
     .table-note {
       color: var(--muted);
-      font-size: 10px;
+      font-size: 11px;
     }
 
     .table-scroll {
@@ -561,11 +531,11 @@
 
     th,
     td {
-      padding: 11px 13px;
+      padding: 12px 14px;
       border-bottom: 1px solid #202020;
       text-align: left;
       white-space: nowrap;
-      font-size: 11px;
+      font-size: 12px;
     }
 
     th {
@@ -573,10 +543,10 @@
       top: 0;
       z-index: 1;
       background: #101010;
-      color: #a9a9a9;
-      font-size: 9px;
+      color: #bdbdbd;
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.55px;
     }
 
     tbody tr:hover {
@@ -586,14 +556,14 @@
     .ticker {
       color: var(--text);
       font-weight: 900;
-      font-size: 12px;
+      font-size: 13px;
     }
 
     .ticker-link {
       color: inherit;
       font-weight: inherit;
       text-decoration: none;
-      border-bottom: 1px dashed rgba(255, 122, 0, 0.5);
+      border-bottom: 1px dashed rgba(255, 122, 0, 0.55);
     }
 
     .ticker-link:hover {
@@ -604,9 +574,9 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 7px;
+      padding: 5px 8px;
       border-radius: 999px;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 850;
     }
 
@@ -635,7 +605,7 @@
     }
 
     .direction-arrow {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 900;
     }
 
@@ -644,292 +614,87 @@
     }
 
     footer {
-      margin: 14px 0 18px;
-      color: #5d5d5d;
-      font-size: 10px;
+      margin-top: 20px;
+      color: #6f6f6f;
+      font-size: 11px;
       text-align: center;
       line-height: 1.55;
     }
 
-    @media (max-width: 1180px) {
-      :root {
-        --topbar-height: 106px;
+    @media (max-width: 1150px) {
+      .control-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .tickers-field {
+        grid-column: span 3;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        width: min(100% - 18px, 1500px);
+        padding-top: 18px;
       }
 
       .header {
         align-items: flex-start;
-        flex-wrap: wrap;
       }
 
-      .brand {
-        width: 100%;
-      }
-
-      .controls {
-        width: 100%;
-      }
-
-      .control-grid {
-        grid-template-columns:
-          minmax(86px, .65fr)
-          minmax(220px, 2fr)
-          minmax(78px, .6fr)
-          minmax(70px, .55fr)
-          minmax(70px, .55fr)
-          minmax(66px, .5fr)
-          100px;
-      }
-    }
-
-    @media (max-width: 760px) {
-      :root {
-        --topbar-height: 150px;
-      }
-
-      .header {
-        padding: 8px;
-        gap: 8px;
-      }
-
-      .subtitle {
+      .method-pill {
         display: none;
       }
 
       .control-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: 1fr 1fr;
       }
 
       .tickers-field {
-        grid-column: span 4;
+        grid-column: span 2;
       }
 
-      .chart-panel {
-        min-height: 520px;
-        padding: 6px;
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .chart-topline {
-        display: block;
+      .chart-wrap {
         min-height: 0;
-        margin: 0 0 6px;
+        height: auto;
+        aspect-ratio: 9 / 16;
       }
 
       .chart-header {
-        margin: 0 2px 6px;
+        display: block;
       }
 
       .chart-note {
-        display: none;
+        margin-top: 5px;
+        text-align: left;
       }
 
       .ticker-visibility {
-        justify-content: space-between;
+        display: block;
+        margin-top: 11px;
       }
 
       .ticker-toggle-list {
-        flex: 1 1 auto;
-      }
-
-      .table-panel {
-        margin: 10px 6px 0;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .field label {
-        font-size: 7px;
-        letter-spacing: .25px;
-      }
-
-      input,
-      select {
-        padding: 0 7px;
-        font-size: 10px;
-      }
-
-      .chart-title {
-        font-size: 11px;
-      }
-    }
-
-    /* Full-viewport layout: compact single-row nav + zero-height chart chrome */
-    :root {
-      --topbar-height: 48px;
-    }
-
-    .header {
-      height: var(--topbar-height);
-      min-height: var(--topbar-height);
-      flex-wrap: nowrap;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 8px;
-      overflow: hidden;
-    }
-
-    .brand {
-      flex: 0 0 auto;
-      width: auto;
-      gap: 6px;
-    }
-
-    .logo {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      font-size: 10px;
-    }
-
-    h1 {
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .subtitle {
-      display: none;
-    }
-
-    .controls {
-      flex: 1 1 auto;
-      width: auto;
-      min-width: 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scrollbar-width: none;
-    }
-
-    .controls::-webkit-scrollbar {
-      display: none;
-    }
-
-    #controlForm {
-      min-width: 590px;
-    }
-
-    .control-grid {
-      grid-template-columns: 76px minmax(170px, 1fr) 68px 56px 62px 48px 64px;
-      gap: 5px;
-      align-items: end;
-    }
-
-    .field label {
-      margin: 0 0 2px 1px;
-      font-size: 7px;
-      line-height: 1;
-      letter-spacing: .3px;
-    }
-
-    input,
-    select,
-    .load-button {
-      height: 27px;
-      border-radius: 6px;
-      font-size: 10px;
-    }
-
-    input,
-    select {
-      padding: 0 7px;
-    }
-
-    .chart-panel {
-      position: relative;
-      display: block;
-      width: 100%;
-      height: calc(100dvh - var(--topbar-height));
-      min-height: 0;
-      padding: 0;
-      margin: 0;
-      overflow: hidden;
-    }
-
-    .chart-wrap {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      border: 0;
-      border-radius: 0;
-    }
-
-    .chart-topline {
-      position: absolute;
-      top: 7px;
-      left: 7px;
-      right: 7px;
-      z-index: 10;
-      display: flex;
-      min-height: 0;
-      margin: 0;
-      pointer-events: none;
-    }
-
-    .chart-header {
-      display: none;
-    }
-
-    .ticker-visibility {
-      margin-left: auto;
-      max-width: min(72vw, 760px);
-      padding: 3px;
-      border: 1px solid rgba(45,45,45,.78);
-      border-radius: 999px;
-      background: rgba(5,5,5,.72);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      pointer-events: auto;
-    }
-
-    .ticker-toggle,
-    .ticker-toggle-action {
-      min-height: 23px;
-      padding: 3px 7px;
-      font-size: 8px;
-    }
-
-    @media (max-width: 760px) {
-      .header {
-        height: var(--topbar-height);
-        min-height: var(--topbar-height);
-        flex-wrap: nowrap;
-        padding: 4px 6px;
         gap: 6px;
       }
 
-      .brand h1 {
-        display: none;
+      .ticker-toggle,
+      .ticker-toggle-action {
+        min-height: 36px;
+        padding: 8px 11px;
       }
 
-      #controlForm {
-        min-width: 570px;
-      }
-
-      .control-grid {
-        grid-template-columns: 72px 170px 64px 54px 58px 46px 60px;
-      }
-
-      .tickers-field {
-        grid-column: auto;
-      }
-
-      .chart-panel {
-        height: calc(100dvh - var(--topbar-height));
-        min-height: 0;
-        padding: 0;
-      }
-
-      .chart-topline {
-        display: flex;
-        margin: 0;
-      }
-
-      .ticker-visibility {
-        width: auto;
-        max-width: calc(100vw - 14px);
+      .ticker-toggle-actions {
+        margin-top: 8px;
       }
     }
-
   </style>
 </head>
 
@@ -945,80 +710,119 @@
       <div class="brand">
         <div class="logo">OQ</div>
         <div>
-          <h1>Momentum Charts</h1>
-          <div class="subtitle">Relative strength · relative momentum</div>
+          <h1>Relative Rotation</h1>
+          <div class="subtitle">
+            Relative strength and momentum versus a selected benchmark.
+          </div>
         </div>
       </div>
 
-      <section class="controls" aria-label="Rotation controls">
-        <form id="controlForm">
-          <div class="control-grid">
-            <div class="field">
-              <label for="benchmark">Benchmark</label>
-              <input id="benchmark" value="SOXX" autocomplete="off" spellcheck="false" />
-            </div>
-
-            <div class="field tickers-field">
-              <label for="tickers">Tickers</label>
-              <input
-                id="tickers"
-                value="NVDA,MU,SNDK,AMD,AVGO"
-                autocomplete="off"
-                spellcheck="false"
-              />
-            </div>
-
-            <div class="field">
-              <label for="period">Period</label>
-              <select id="period">
-                <option value="1y">1 year</option>
-                <option value="2y" selected>2 years</option>
-                <option value="5y">5 years</option>
-                <option value="10y">10 years</option>
-                <option value="max">Maximum</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="ratioWindow">RS window</label>
-              <input id="ratioWindow" type="number" min="20" max="156" value="52" />
-            </div>
-
-            <div class="field">
-              <label for="momentumWeeks">Momentum</label>
-              <input id="momentumWeeks" type="number" min="1" max="26" value="4" />
-            </div>
-
-            <div class="field">
-              <label for="trailWeeks">Trail</label>
-              <input id="trailWeeks" type="number" min="2" max="26" value="8" />
-            </div>
-
-            <button id="loadButton" class="load-button" type="submit">
-              Load
-            </button>
-          </div>
-
-          <div id="status" class="status" role="status" aria-live="polite"></div>
-        </form>
-      </section>
+      <div class="method-pill">
+        OQLIV Rotation v1
+      </div>
     </header>
 
-    <section class="chart-panel">
-      <div class="chart-topline">
-        <div class="chart-header">
-          <div class="chart-title">Rotation Map</div>
-          <div class="chart-note">
-            X = normalized relative strength · Y = 4-week relative momentum · center = 100 / 100
+    <section class="panel controls">
+      <form id="controlForm">
+        <div class="control-grid">
+          <div class="field">
+            <label for="benchmark">Benchmark</label>
+            <input id="benchmark" value="SOXX" autocomplete="off" spellcheck="false" />
           </div>
+
+          <div class="field tickers-field">
+            <label for="tickers">Tickers</label>
+            <input
+              id="tickers"
+              value="NVDA,MU,SNDK,AMD,AVGO"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="field">
+            <label for="period">Period</label>
+            <select id="period">
+              <option value="1y">1 year</option>
+              <option value="2y" selected>2 years</option>
+              <option value="5y">5 years</option>
+              <option value="10y">10 years</option>
+              <option value="max">Maximum</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="ratioWindow">RS window</label>
+            <input id="ratioWindow" type="number" min="20" max="156" value="52" />
+          </div>
+
+          <div class="field">
+            <label for="momentumWeeks">Momentum</label>
+            <input id="momentumWeeks" type="number" min="1" max="26" value="4" />
+          </div>
+
+          <div class="field">
+            <label for="trailWeeks">Trail</label>
+            <input id="trailWeeks" type="number" min="2" max="26" value="8" />
+          </div>
+
+          <button id="loadButton" class="load-button" type="submit">
+            Load Rotation
+          </button>
         </div>
 
-        <div class="ticker-visibility" aria-label="Chart ticker visibility controls">
-          <div id="tickerToggles" class="ticker-toggle-list"></div>
-          <div class="ticker-toggle-actions">
-            <button id="showAllTickers" class="ticker-toggle-action" type="button">All</button>
-            <button id="hideAllTickers" class="ticker-toggle-action" type="button">None</button>
-          </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="summary-grid">
+      <article class="panel summary-card">
+        <div class="summary-label">Benchmark</div>
+        <div id="summaryBenchmark" class="summary-value">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Leading</div>
+        <div id="summaryLeading" class="summary-value leading">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Improving</div>
+        <div id="summaryImproving" class="summary-value improving">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Weakening</div>
+        <div id="summaryWeakening" class="summary-value weakening">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Lagging</div>
+        <div id="summaryLagging" class="summary-value lagging">—</div>
+      </article>
+
+      <article class="panel summary-card">
+        <div class="summary-label">Starting Week</div>
+        <div id="summaryAsof" class="summary-value">—</div>
+      </article>
+    </section>
+
+    <section class="panel chart-panel">
+      <div class="chart-header">
+        <div class="chart-title">
+          Rotation Map
+        </div>
+
+        <div class="chart-note">
+          X = normalized relative strength · Y = 4-week relative momentum · center = 100 / 100
+        </div>
+      </div>
+
+      <div class="ticker-visibility" aria-label="Chart ticker visibility controls">
+        <div id="tickerToggles" class="ticker-toggle-list"></div>
+        <div class="ticker-toggle-actions">
+          <button id="showAllTickers" class="ticker-toggle-action" type="button">Show all</button>
+          <button id="hideAllTickers" class="ticker-toggle-action" type="button">Hide all</button>
         </div>
       </div>
 
@@ -1048,7 +852,7 @@
               <th>Δ RS</th>
               <th>Δ Momentum</th>
               <th>Distance</th>
-              <th>Week Start</th>
+              <th>Starting Week</th>
             </tr>
           </thead>
           <tbody id="rotationRows"></tbody>
@@ -1057,7 +861,7 @@
     </section>
 
     <footer>
-      OQLIV relative-rotation model.
+      OQLIV relative-rotation model. 
     </footer>
   </main>
 
@@ -1452,7 +1256,7 @@
         ${member.quadrant} · ${member.phase}<br>
         RS Ratio: ${formatNumber(current.x, 2)}<br>
         RS Momentum: ${formatNumber(current.y, 2)}<br>
-        ${current.date ? `Week Start: ${current.date}<br>` : ""}
+        ${current.date ? `Date: ${current.date}<br>` : ""}
         Direction: ${member.direction_arrow || ""} ${member.direction || ""}<br>
         Speed: ${member.speed || "—"}
       `;
@@ -1590,20 +1394,11 @@
 
       const isMobile =
         window.matchMedia(
-          "(max-width: 760px)"
+          "(max-width: 720px)"
         ).matches;
 
-      const measuredWidth =
-        Math.round(chartWrap.clientWidth || 0);
-
-      const measuredHeight =
-        Math.round(chartWrap.clientHeight || 0);
-
-      const width =
-        Math.max(1, measuredWidth);
-
-      const height =
-        Math.max(1, measuredHeight);
+      const width = isMobile ? 720 : 1400;
+      const height = isMobile ? 1280 : 720;
 
       const margin = isMobile
         ? {
@@ -2192,15 +1987,53 @@
       const metadata =
         payload.metadata || {};
 
+      const counts =
+        metadata.quadrant_counts || {};
+
+      document.getElementById(
+        "summaryBenchmark"
+      ).textContent =
+        metadata.benchmark || "—";
+
+      document.getElementById(
+        "summaryLeading"
+      ).textContent =
+        counts.Leading ?? 0;
+
+      document.getElementById(
+        "summaryImproving"
+      ).textContent =
+        counts.Improving ?? 0;
+
+      document.getElementById(
+        "summaryWeakening"
+      ).textContent =
+        counts.Weakening ?? 0;
+
+      document.getElementById(
+        "summaryLagging"
+      ).textContent =
+        counts.Lagging ?? 0;
+
       const members =
-        Array.isArray(payload.members)
-          ? payload.members
-          : [];
+        payload.members || [];
+
+      const asof =
+        members
+          .map(m => m.asof)
+          .filter(Boolean)
+          .sort()
+          .at(-1);
+
+      document.getElementById(
+        "summaryAsof"
+      ).textContent =
+        asof || "—";
 
       document.getElementById(
         "tableNote"
       ).textContent =
-        `${metadata.benchmark || "—"} benchmark · ${metadata.valid_members ?? members.length} valid · ${metadata.failed_members ?? 0} failed · ${metadata.price_fetches ?? "—"} price fetch`;
+        `${metadata.valid_members ?? members.length} valid · ${metadata.failed_members ?? 0} failed · ${metadata.price_fetches ?? "—"} price fetch`;
     }
 
     function renderTable(payload) {
